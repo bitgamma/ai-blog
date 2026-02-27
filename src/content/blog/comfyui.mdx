@@ -1,0 +1,188 @@
+---
+title: 'Installing ComfyUI on AMD APUs'
+description: 'A guide to install ComfyUI on AMD APUs (Strix Halo/Strix Point)'
+pubDate: 'Feb 27 2026'
+heroImage: '../../assets/heros/blog-placeholder-5.jpg'
+---
+
+This step-by-step guide shows how to install ComfyUI as a systemd service running under a dedicated system user on Strix Halo or Strix Point machines. It has been written and tested on Arch Linux, but the instructions should be generic enough to apply to other distributions.
+
+The goal of this guide is to end up with a configuration that works well, runs fast, and allows you to tinker when and if you feel like it.
+
+## Prerequisites
+
+Make sure you installed the following packages:
+
+- uv
+- git
+- nano (or your favorite text editor)
+
+## Creating the ComfyUI User
+
+We want to create a dedicated system user to run ComfyUI. This is a good security practice. This user won't be able to log in and doesn't have a password. It will only be used to run ComfyUI. Run these commands:
+
+
+```bash
+sudo useradd --system -s /usr/bin/nologin -d /var/lib/comfyui comfyui
+sudo mkdir /var/lib/comfyui
+sudo chown comfyui:comfyui /var/lib/comfyui
+```
+
+You can change all instances of `/var/lib/comfyui` in the commands above to your preferred location.
+
+## Installing ComfyUI
+
+Now let's install ComfyUI. Run these commands:
+
+```bash
+sudo -u comfyui bash
+cd
+git clone https://github.com/Comfy-Org/ComfyUI .
+uv venv --python 3.13
+uv pip install -r requirements.txt --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+uv pip install -r manager_requirements.txt
+exit
+```
+
+Note 1: Python 3.13 is recommended for the time being; `uv` will handle this automatically.
+Note 2: For Strix Point, the URL becomes `https://rocm.nightlies.amd.com/v2-staging/gfx1150`.
+
+## Running with systemd
+
+We now need to create a systemd unit file to run ComfyUI. Open `/etc/systemd/system/comfyui.service`:
+
+```bash
+sudo nano /etc/systemd/system/comfyui.service
+```
+
+Then paste the following content:
+
+```
+[Unit]
+Description=ComfyUI
+After=network-online.target
+
+[Service]
+Type=simple
+User=comfyui
+Group=comfyui
+StateDirectory=comfyui
+CacheDirectory=comfyui
+ProtectHome=false
+WorkingDirectory=/var/lib/comfyui
+Environment=VIRTUAL_ENV=/var/lib/comfyui/.venv
+Environment=PATH=/var/lib/comfyui/.venv/bin:/usr/bin:/bin
+Environment=TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
+Environment=COMFYUI_ENABLE_MIOPEN=0
+Environment=TORCH_BLAS_PREFER_HIPBLASLT=1
+Environment=TORCHINDUCTOR_CACHE_DIR=/var/lib/comfyui/.cache/torchinductor
+Environment=CC=/var/lib/comfyui/.venv/bin/amdclang
+Environment=CXX=/var/lib/comfyui/.venv/bin/amdclang++
+Environment=FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+ExecStart=/var/lib/comfyui/.venv/bin/python /var/lib/comfyui/main.py --enable-manager --use-pytorch-cross-attention
+Restart=on-failure
+RestartSec=5s
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Remember to replace all instances of `/var/lib/comfyui` with the actual path you are using if applicable. Some of the environment variables set here aren't strictly needed but are included to support future tinkering.
+
+Now, if you want ComfyUI to start automatically at boot, run the following:
+
+```bash
+sudo systemctl enable --now comfyui
+```
+
+If instead you want to run it just once, run this instead:
+
+```bash
+sudo systemctl start comfyui
+```
+
+## Running on a Local Network
+
+If you plan to access ComfyUI on your local network - for example, on a dedicated machine—replace the `ExecStart` line in the systemd unit file with the following:
+
+```
+ExecStart=/var/lib/comfyui/.venv/bin/python /var/lib/comfyui/main.py --listen --enable-manager --use-pytorch-cross-attention
+```
+
+Additionally, if you want to use ComfyUI Manager from other computers on your local network, do the following:
+
+```bash
+sudo -u comfyui bash
+cd
+nano user/__manager/config.ini
+```
+
+and search for the line:
+
+```
+network_mode = public
+```
+
+and replace it with:
+
+```
+network_mode = personal_cloud
+```
+
+Then you will need to restart ComfyUI:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart comfyui
+```
+
+Another tip—especially applicable if you only access ComfyUI remotely (for example, if it runs on a headless server)—is to install the `Workflow Models Downloader` plugin through ComfyUI Manager. This provides a user-friendly interface to download models from Hugging Face and CivitAI.
+
+## Updating ComfyUI
+
+Periodically, you will want to update ComfyUI. This can be achieved with the following commands:
+
+```bash
+sudo -u comfyui bash
+cd
+git pull
+uv pip install -r requirements.txt --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+uv pip install -r manager_requirements.txt
+```
+
+Once again, if you are on Strix Point, adjust the URL to `https://rocm.nightlies.amd.com/v2-staging/gfx1150`.
+
+
+As the `uv` cache tends to grow, periodically you may also want to run:
+
+```bash
+uv cache clean
+```
+
+to recover some disk space.
+
+## VRAM Configuration and Performance Tuning
+
+By default, the `amdgpu` driver allows up to 50% of system memory to be used as VRAM. While this is a safe default, we need more VRAM to run larger models, so we will change this setting. However, I do not advise allowing the GPU to allocate 100% of RAM. My rule of thumb is to reserve at least 16GB of RAM for the system if you use a desktop environment, and at least 8GB if you do not. Here's how to set this:
+
+### VRAM Settings in the BIOS
+
+Set the iGPU VRAM size to the smallest value available (usually 512MB). This may seem counter-intuitive, but the VRAM value set in BIOS is not what we will actually use.
+
+### VRAM Settings in Linux
+
+The exact procedure may depend on your distribution. Note that the memory to allocate is expressed in pages, not bytes. [This page from the Arch wiki](https://wiki.archlinux.org/title/Framework_Desktop#Unified_memory) provides a useful table with common sizes. The instructions there should be fairly generic, but please refer to distribution-specific tutorials for guidance.
+
+### Tuned
+
+This is suggested in many guides. I find the effect to be very small, but it does seem to exist. Just install the `tuned` package and run:
+
+```bash
+sudo systemctl enable --now tuned
+sudo tuned-adm profile accelerator-performance
+```
+
+### ComfyUI
+
+We can achieve some non-negligible performance gains by enabling `torch.compile` for models. You can download my workflows for [Flux 2 Klein](/public/comfyui/Flux2-Klein.json) (works with 9b and 4b), [Z-Image](/public/comfyui/Z-Image.json) (works with Turbo and Base), and [Anima](/public/comfyui/Anima.json) if you want a quick way to set this up. You will need to download some custom nodes, but ComfyUI Manager should make this very easy.
