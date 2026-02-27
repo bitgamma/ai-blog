@@ -6,6 +6,7 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://bitgamma.github.io/ai-blog/',
+	site: 'https://bitgamma.github.io',
+	base: '/ai-blog',
 	integrations: [mdx(), sitemap()],
 });
