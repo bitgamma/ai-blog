@@ -1,0 +1,116 @@
+## Requirements
+- uv
+- git
+
+## Install
+git clone https://github.com/kohya-ss/musubi-tuner/
+uv venv --python 3.12
+source .venv/bin/activate
+uv pip install -e . --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+uv pip install torchvision --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+
+accelerate config
+> Do you wish to use mixed precision? 
+bf16
+
+## Download Klein 4b
+hf auth login > enter token
+hf download black-forest-labs/FLUX.2-klein-base-4B
+hf download black-forest-labs/FLUX.2-dev --include ae.safetensors
+
+or download all files from https://huggingface.co/black-forest-labs/FLUX.2-klein-4B/ and `ae.safetensors` from https://huggingface.co/black-forest-labs/FLUX.2-dev/tree/main (the VAE in the klein repo is not compatible) using your browser.
+
+## Create dataset
+
+make dir with lora name
+put images and captions (same name .txt) in dataset
+make a cache dir
+put a file named config.toml
+
+```
+[general]
+resolution = [1024, 1024]
+caption_extension = ".txt"
+batch_size = 4
+enable_bucket = true
+bucket_no_upscale = true
+
+[[datasets]]
+image_directory = "~/mikkoph-lora/dataset"
+cache_directory = "~/mikkoph-lora/cache"
+num_repeats = 1 
+```
+
+```bash
+export MIOPEN_FIND_MODE=FAST
+export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
+export TORCH_BLAS_PREFER_HIPBLASLT=1
+export CC=$HOME/musubi-tuner/.venv/bin/amdclang
+export CXX=$HOME/musubi-tuner/.venv/bin/amdclang++
+```
+
+## Cache latents
+python flux_2_cache_latents.py --dataset_config ~/mikkoph-lora/config.toml --vae ~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-dev/snapshots/26afe3a78bb242c0a8bb181dcc8937bb16e5c66c/ae.safetensors --model_version klein-base-4b --disable_cudnn_backend
+ignore warning
+
+## cache captions
+python flux_2_cache_text_encoder_outputs.py --dataset_config ~/mikkoph-lora/config.toml --text_encoder ~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-klein-base-4B/snapshots/a3b4f4849157f664bdbc776fd7453c2783562f4d/text_encoder/model-00001-of-00002.safetensors --batch_size 16 --model_version klein-base-4b
+
+
+accelerate launch --num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py \
+    --model_version klein-base-4b \
+    --dit ~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-klein-base-4B/snapshots/a3b4f4849157f664bdbc776fd7453c2783562f4d/flux-2-klein-base-4b.safetensors \
+    --vae ~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-dev/snapshots/26afe3a78bb242c0a8bb181dcc8937bb16e5c66c/ae.safetensors \
+    --text_encoder ~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-klein-base-4B/snapshots/a3b4f4849157f664bdbc776fd7453c2783562f4d/text_encoder/model-00001-of-00002.safetensors \
+    --dataset_config ~/mikkoph-lora/config.toml \
+    --sdpa --mixed_precision bf16 \
+    --timestep_sampling flux2_shift --weighting_scheme none \
+    --optimizer_type adamw --learning_rate 1e-4 \
+    --max_data_loader_n_workers 2 --persistent_data_loader_workers \
+    --network_module networks.lora_flux_2 --network_dim 16 \
+    --max_train_epochs 30 --save_every_n_epochs 2 --seed 42 \
+    --output_dir ~/mikkoph-lora/output --output_name mikkoph-style \
+    --compile --compile_mode default \
+    --sample_prompts ~/mikkoph-lora/reference_prompts.txt --sample_every_n_epochs 2 --sample_at_first
+
+    ignore the compilation warnings
+
+
+```
+# config.toml
+[general]
+model_version = "klein-base-4b"
+dit = "~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-klein-base-4B/snapshots/a3b4f4849157f664bdbc776fd7453c2783562f4d/flux-2-klein-base-4b.safetensors"
+vae = "~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-dev/snapshots/26afe3a78bb242c0a8bb181dcc8937bb16e5c66c/ae.safetensors"
+text_encoder = "~/.cache/huggingface/hub/models--black-forest-labs--FLUX.2-klein-base-4B/snapshots/a3b4f4849157f664bdbc776fd7453c2783562f4d/text_encoder/model-00001-of-00002.safetensors"
+dataset_config = "~/mikkoph-lora/config.toml"
+persistent_data_loader_workers = true
+max_data_loader_n_workers = 2
+
+[network]
+network_module = "networks.lora_flux_2"
+network_dim = 16
+network_alpha = 16
+
+[optimizer]
+optimizer_type = "AdamW"
+learning_rate = 1e-4
+
+[training]
+seed = 42
+max_train_epochs = 30
+save_every_n_epochs = 2
+mixed_precision = "bf16"
+sdpa = true
+timestep_sampling = "flux2_shift"
+weighting_scheme = "none"
+
+[output]
+output_dir = "~/mikkoph-lora/output"
+output_name = "mikkoph-style"
+sample_prompts = "~/mikkoph-lora/reference_prompts.txt"
+sample_every_n_epochs = 2
+sample_at_first = true
+```
+
+``` accelerate launch --num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py --config_file training.toml ```
