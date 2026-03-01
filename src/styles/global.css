@@ -87,12 +87,24 @@ input {
 	font-size: 16px;
 }
 table {
-	width: 100%;
+	width: fit-content;
+	border-collapse:collapse;
+	max-width: 100%;
+	margin-top: 1em;
+}
+td, th {
+	padding: 0.5em;
+	border: solid white 1px;
+}
+tr:nth-child(even), thead tr:first-child {
+	background-color: var(--black);
+}
+tr:nth-child(odd) {
+	background-color: var(--gray);
 }
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 8px;
 }
 code {
 	padding: 2px 5px;

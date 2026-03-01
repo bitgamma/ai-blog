@@ -3,8 +3,24 @@ title: 'Training Klein 9B/4B LoRAs with Musubi-Tuner on AMD Strix Halo'
 description: 'A comprehensive guide to train Flux.2 Klein 4B/9B LoRAs on AMD Strix Halo'
 pubDate: 'Feb 28 2026'
 ---
+import { Image } from "astro:assets";
+import loraTrainingEpoch00 from "../../assets/musubi-tuner/lora-training-epoch00.png";
+import loraTrainingEpoch06 from "../../assets/musubi-tuner/lora-training-epoch06.png";
+import loraTrainingEpoch12 from "../../assets/musubi-tuner/lora-training-epoch12.png";
+import loraTrainingEpoch20 from "../../assets/musubi-tuner/lora-training-epoch20.png";
+import loraTrainingEpoch30 from "../../assets/musubi-tuner/lora-training-epoch30.png";
+import portrait1Lora from "../../assets/musubi-tuner/portrait1-lora.png";
+import portrait1NoLora from "../../assets/musubi-tuner/portrait1-nolora.png";
+import portrait2Lora from "../../assets/musubi-tuner/portrait2-lora.png";
+import portrait2NoLora from "../../assets/musubi-tuner/portrait2-nolora.png";
+import portrait3Lora from "../../assets/musubi-tuner/portrait3-lora.png";
+import portrait3NoLora from "../../assets/musubi-tuner/portrait3-nolora.png";
+import portrait4Lora from "../../assets/musubi-tuner/portrait4-lora.png";
+import portrait4NoLora from "../../assets/musubi-tuner/portrait4-nolora.png";
+import portrait5Lora from "../../assets/musubi-tuner/portrait5-lora.png";
+import portrait5NoLora from "../../assets/musubi-tuner/portrait5-nolora.png";
 
-This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide is for both Flux.2 Klein 4B and 9B. For other models, small adjustments will be needed, and they will be addressed in future guides.
+This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide is for both Flux.2 Klein 4B and 9B. For other models, small adjustments will be needed, and they will be addressed in future guides. These are the steps that I followed to train a LoRA for Klein 9B and 4B based on my photographic style. I will show some examples based on my own LoRA training where applicable.
 
 ## Hardware Requirements
 
@@ -207,7 +223,16 @@ During training, you'll see:
 | 10-20 | Check for overfitting (samples look too much like training images) |
 | 20+ | If loss is still decreasing, consider more epochs |
 
-However, the best way to tell is to test the checkpoints that look promising with the distilled model using [ComfyUI](../comfyui/). I have found that often the last checkpoint is overtrained, and I prefer to use 2-4 epoch older checkpoints.
+Here are some examples from my training:
+
+| Epoch 0 | Epoch 6 | Epoch 12 | Epoch 20 | Epoch 30  |
+|-----------------|---------|----------|----------|------------------------|
+| <Image src={loraTrainingEpoch00} width={180} alt="Epoch 0 (Start) - Training loss and sample images at the beginning of training" /> | <Image src={loraTrainingEpoch06} width={180} alt="Epoch 6 - Early learning phase showing initial style emergence" /> | <Image src={loraTrainingEpoch12} width={180} alt="Epoch 12 - Mid-training with clearer style development" /> | <Image src={loraTrainingEpoch20} width={180} alt="Epoch 20 - Best checkpoint with optimal style quality" /> | <Image src={loraTrainingEpoch30} width={180} alt="Epoch 30 - Overtrained checkpoint with degraded quality" /> |
+| Start | Early learning | Mid-training | Best checkpoint | Overtrained |
+
+The last checkpoint is clearly overtrained and quality degraded significantly. I used checkpoint 20 instead.
+
+However, I still tested all most promising checkpoints with the distilled model using [ComfyUI](../comfyui/). That's the only way to be sure.
 
 ## Using Your Trained LoRA
 
@@ -232,6 +257,18 @@ The final checkpoint won't have a sequence number.
 ### In other tools
 
 Most tools that support Stable Diffusion LoRAs will work with Flux LoRAs. Look for a "Load LoRA" or similar node/module.
+
+### Results
+
+Here are some examples images generated using my LoRA. They are generated with the same prompt and seed using Klein 4B. Left is with LoRA, right is without.
+
+| With LoRA | Without LoRA |
+|-----------|--------------|
+| <Image src={portrait1Lora} width={340} alt="Portrait 1 with LoRA" /> | <Image src={portrait1NoLora} width={340} alt="Portrait 1 without LoRA" /> |
+| <Image src={portrait2Lora} width={340} alt="Portrait 2 with LoRA" /> | <Image src={portrait2NoLora} width={340} alt="Portrait 2 without LoRA" /> |
+| <Image src={portrait3Lora} width={340} alt="Portrait 3 with LoRA" /> | <Image src={portrait3NoLora} width={340} alt="Portrait 3 without LoRA" /> |
+| <Image src={portrait4Lora} width={340} alt="Portrait 4 with LoRA" /> | <Image src={portrait4NoLora} width={340} alt="Portrait 4 without LoRA" /> |
+| <Image src={portrait5Lora} width={340} alt="Portrait 5 with LoRA" /> | <Image src={portrait5NoLora} width={340} alt="Portrait 5 without LoRA" /> |
 
 ## Troubleshooting
 
@@ -258,5 +295,6 @@ For more information, check out:
 
 - [Musubi-Tuner GitHub](https://github.com/kohya-ss/musubi-tuner)
 - [LoRA Theory and Practice](https://arxiv.org/abs/2106.09685)
+- [My HugginFace](https://huggingface.co/mikkoph)
 
 Happy training!
