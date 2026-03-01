@@ -62,7 +62,7 @@ init_env() {
     export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
     export TORCH_BLAS_PREFER_HIPBLASLT=1
 
-    cd "$MUSUBI_TUNER_INSTALL_DIR"
+    cd "$MUSUBI_TUNER_INSTALL_DIR/musubi-tuner"
 
     # Ensure virtual environment is active
     if [ -z "$VIRTUAL_ENV" ]; then
@@ -304,8 +304,8 @@ create_flux2() {
     echo "3. Edit reference prompts in: ${PROJECT_DIR}/reference_prompts.txt"
     echo "4. Run the caching and training steps:"
     echo ""
-    echo "   bash $0 cache"
-    echo "   bash $0 train"
+    echo "   $0 cache"
+    echo "   $0 train"
     echo ""    
 }
 
