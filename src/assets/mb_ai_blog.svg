@@ -18,7 +18,7 @@
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
-     bordercolor="#000000"
+     bordercolor="#f4f3ee"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
@@ -41,13 +41,13 @@
     <g
        id="g2">
       <path
-         style="fill:#000000"
+         style="fill:#f4f3ee"
          d="m 37.459784,47.126529 1.787784,-0.47603 9.903,20.62337 9.857708,-20.37578 1.808508,1.45141 4.54e-4,30.33333 H 41.706074 v -2.66667 h 16.444495 l 2.15e-4,-22.33333 -9.204515,19.33333 -9.385485,-20 v 25.66667 h -2.101 z"
          id="path1"
          sodipodi:nodetypes="ccccccccccccccc" />
       <path
          d="m 69.823805,62.666664 v -25.44444 l 0.83334,0.27777 0.83333,0.27778 v 24.88889 24.88889 l -0.83333,0.27778 -0.83334,0.27777 z"
-         style="fill:#000000"
+         style="fill:#f4f3ee"
          id="path1-2" />
     </g>
   </g>

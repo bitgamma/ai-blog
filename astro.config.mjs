@@ -10,4 +10,7 @@ export default defineConfig({
 	base: '/ai-blog/',
 	trailingSlash: 'always',
 	integrations: [mdx(), sitemap()],
+  redirects: {
+    '/': 'blog/'
+  }
 });
