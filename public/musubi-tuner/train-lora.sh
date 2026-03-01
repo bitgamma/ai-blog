@@ -8,25 +8,35 @@ set -e  # Exit on error
 # ==================== CONFIGURATION ====================
 # Edit these values for your setup
 
+# Install parameters
+GFX_NAME="${GFX_NAME:-gfx1151}"
+MUSUBI_TUNER_INSTALL_DIR="${MUSUBI_TUNER_INSTALL_DIR:-$HOME}"
+
 # Model paths (provide the paths to your model files)
-DIT_MODEL=""  # Path to diffusion model (e.g., flux-2-klein-base-4b.safetensors)
-VAE_MODEL=""  # Path to VAE model (e.g., ae.safetensors)
-TEXT_ENCODER=""  # Path to text encoder model (e.g., model-00001-of-00002.safetensors)
+DIT_MODEL="${DIT_MODEL:-}"  # Path to diffusion model (e.g., flux-2-klein-base-4b.safetensors)
+VAE_MODEL="${VAE_MODEL:-}"  # Path to VAE model (e.g., ae.safetensors)
+TEXT_ENCODER="${TEXT_ENCODER:-}"  # Path to text encoder model (e.g., model-00001-of-00002.safetensors)
 
 # Project configuration
-PROJECT_NAME=""  # Name for your project (e.g., "my-style")
-MODEL_VERSION="klein-base-4b"  # Model version: "klein-base-4b" or "klein-base-9b"
+PROJECT_NAME="${PROJECT_NAME:-my-lora}"  # Name for your project
+MODEL_VERSION="${MODEL_VERSION:-klein-base-4b}"  # Model version: "klein-base-4b" or "klein-base-9b"
 
 # Training parameters
-NETWORK_DIM=16
-NETWORK_ALPHA=16
-LEARNING_RATE=1e-4
-MAX_EPOCHS=30
-SAVE_EVERY_N=2
-BATCH_SIZE=4
-RESOLUTION=1024
+NETWORK_DIM="${NETWORK_DIM:-16}"
+LEARNING_RATE="${LEARNING_RATE:-1e-4}"
+MAX_EPOCHS="${MAX_EPOCHS:-30}"
+SAVE_EVERY_N="${SAVE_EVERY_N:-2}"
+BATCH_SIZE="${BATCH_SIZE:-4}"
+RESOLUTION="${RESOLUTION:-1024}"
 
 # ======================================================
+
+# Runtime vars
+
+PROJECT_DIR="${PWD}/${PROJECT_NAME}"
+DATASET_DIR="${PROJECT_DIR}/dataset"
+CACHE_DIR="${PROJECT_DIR}/cache"
+OUTPUT_DIR="${PROJECT_DIR}/output"
 
 # Colors for output
 RED='\033[0;31m'
@@ -52,10 +62,7 @@ init_env() {
     export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
     export TORCH_BLAS_PREFER_HIPBLASLT=1
 
-    PROJECT_DIR="${HOME}/${PROJECT_NAME}"
-    OUTPUT_DIR="${PROJECT_DIR}/output"
-    WORKSPACE_DIR="${HOME}/musubi-tuner-workspace"
-    cd "$WORKSPACE_DIR/musubi-tuner"
+    cd "$MUSUBI_TUNER_INSTALL_DIR"
 
     # Ensure virtual environment is active
     if [ -z "$VIRTUAL_ENV" ]; then
@@ -79,12 +86,13 @@ check_dependencies() {
 
 # Setup musubi-tuner environment
 setup_musubi_tuner() {
+    check_dependencies
+
     log_info "Setting up musubi-tuner environment..."
     
     # Create workspace directory if it doesn't exist
-    WORKSPACE_DIR="${HOME}/musubi-tuner-workspace"
-    mkdir -p "$WORKSPACE_DIR"
-    cd "$WORKSPACE_DIR"
+    mkdir -p "$MUSUBI_TUNER_INSTALL_DIR"
+    cd "$MUSUBI_TUNER_INSTALL_DIR"
     
     # Clone repository if it doesn't exist
     if [ ! -d "musubi-tuner" ]; then
@@ -105,11 +113,11 @@ setup_musubi_tuner() {
     
     # Install musubi-tuner with AMD GPU support
     log_info "Installing musubi-tuner..."
-    uv pip install -e . --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+    uv pip install -e . --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
     
     # Install torchvision with AMD GPU support
     log_info "Installing torchvision..."
-    uv pip install torchvision --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+    uv pip install torchvision --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
     
     log_info "musubi-tuner environment setup complete."
 }
@@ -169,11 +177,6 @@ validate_inputs() {
 create_project_dirs() {
     log_info "Creating project directories..."
     
-    PROJECT_DIR="${HOME}/${PROJECT_NAME}"
-    DATASET_DIR="${PROJECT_DIR}/dataset"
-    CACHE_DIR="${PROJECT_DIR}/cache"
-    OUTPUT_DIR="${PROJECT_DIR}/output"
-    
     mkdir -p "$DATASET_DIR"
     mkdir -p "$CACHE_DIR"
     mkdir -p "$OUTPUT_DIR"
@@ -221,9 +224,12 @@ create_reference_prompts() {
     fi
     
     cat > "${PROJECT_DIR}/reference_prompts.txt" << EOF
-a portrait of a person with distinctive features, cinematic lighting
-a landscape scene with natural beauty, vibrant colors
-an object or scene of your choice, detailed rendering
+# add prompts one per line to create sample images. Add as many as you need but remember that it takes time to generate them
+# you will also want to add a few parameters at the end of each prompt (on the same line). Most important ones are:
+# --w: image width (eg: --w 1024)
+# --h: image height (eg: --h 1024)
+# --d: the seed. Setting a fixed seed is a good idea to make samples more comparable to each other (eg: --d 42)
+# --s: the number of steps. A number between and 30-50 will work fine for Klein (e.g: --s 30)
 EOF
 
     log_info "Reference prompts created at ${PROJECT_DIR}/reference_prompts.txt"
@@ -254,7 +260,6 @@ compile_mode = "default"
 [network]
 network_module = "networks.lora_flux_2"
 network_dim = ${NETWORK_DIM}
-network_alpha = ${NETWORK_ALPHA}
 
 [optimizer]
 optimizer_type = "AdamW"
@@ -278,6 +283,29 @@ sample_at_first = true
 EOF
 
     log_info "Training config created at ${PROJECT_DIR}/training.toml"
+}
+
+# Create Flux2 project (directories + configs)
+create_flux2() {
+    log_info "Creating Flux2 project..."
+    
+    validate_inputs
+    create_project_dirs
+    create_dataset_config
+    create_reference_prompts
+    create_training_config
+    
+    log_info "Flux2 project created successfully at ${PROJECT_DIR}"
+
+    echo "Next steps:"
+    echo "1. Add your training images to: ${DATASET_DIR}"
+    echo "2. Edit captions for your images"
+    echo "3. Edit reference prompts in: ${PROJECT_DIR}/reference_prompts.txt"
+    echo "4. Run the caching and training steps:"
+    echo ""
+    echo "   bash $0 cache"
+    echo "   bash $0 train"
+    echo ""    
 }
 
 # Cache latents
@@ -343,58 +371,27 @@ train_lora() {
     log_info "Your LoRA checkpoints are in: ${OUTPUT_DIR}"
 }
 
-# Main execution
-main() {
-    echo "========================================"
-    echo "  Musubi-Tuner LoRA Training Script"
-    echo "========================================"
-    echo ""
-    
-    check_dependencies
-    setup_musubi_tuner
-    validate_inputs
-    create_project_dirs
-    create_dataset_config
-    create_reference_prompts
-    create_training_config
-    
-    echo ""
-    echo "========================================"
-    echo "  Setup Complete!"
-    echo "========================================"
-    echo ""
-    echo "Next steps:"
-    echo "1. Add your training images to: ${DATASET_DIR}"
-    echo "2. Edit captions for your images"
-    echo "3. Edit reference prompts in: ${PROJECT_DIR}/reference_prompts.txt"
-    echo "4. Run the caching and training steps:"
-    echo ""
-    echo "   bash ${PROJECT_DIR}/train-lora.sh cache"
-    echo "   bash ${PROJECT_DIR}/train-lora.sh train"
-    echo ""
+# Help function
+help() {
+    echo "Usage: $0 {setup|create-flux2|cache|train}"
 }
 
-# Run specific step
-run_step() {
-    case "$1" in
-        cache)
-            cache_latents
-            cache_text_encoders
-            ;;
-        train)
-            train_lora
-            ;;
-        *)
-            log_error "Unknown step: $1"
-            echo "Usage: $0 {cache|train}"
-            exit 1
-            ;;
-    esac
-}
-
-# Entry point
-if [ "$1" == "cache" ] || [ "$1" == "train" ]; then
-    run_step "$1"
-else
-    main
-fi
+case "$1" in
+    setup)
+        setup_musubi_tuner
+        ;;
+    create-flux2)
+        create_flux2
+        ;;
+    cache)
+        cache_latents
+        cache_text_encoders
+        ;;
+    train)
+        train_lora
+        ;;
+    *)
+        help
+        exit 1
+        ;;
+esac

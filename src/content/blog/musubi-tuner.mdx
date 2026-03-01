@@ -5,19 +5,11 @@ pubDate: 'Feb 28 2026'
 heroImage: '../../assets/heros/blog-placeholder-5.jpg'
 ---
 
-This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo GPUs. We'll use Flux 2 Klein 4B as an example but the guide applies to Flux 2 Klein 9B and can be adapted to other models as well.
+This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo GPUs. We'll use Flux 2 Klein 4B as an example but all scripts and commands listed here also apply to Klein 9B. For other models small adjustments will be needed they and will be addressed in future guides.
 
 ## Hardware Requirements
 
-This guide is optimized for AMD GPUs with the following recommendations:
-
-| Component | Minimum | Recommended | Notes |
-|-----------|---------|-------------|-------|
-| GPU | AMD Radeon RX 7900 XTX | AMD Radeon RX 7900 XTX or better | RDNA3 architecture required |
-| RAM | 64 GB | 128 GB | Strix Halo |
-| OS  | Any Linux | Linux (Arch/Ubuntu) | ROCm is installed automatically by uv |
-
-**Note on RAM:** Training with 64GB is possible but may require smaller batch sizes or lower resolutions. 128GB provides the most comfortable experience.
+This guide assumes a Strix Halo with 128GB of RAM for the default path. Refer to the [Out of VRAM](#out-of-vram) section if you are running into problems.
 
 ## Prerequisites
 
@@ -35,7 +27,6 @@ sudo pacman -S uv git
 # Ubuntu/Debian
 sudo apt install uv git
 ```
-
 
 ## Installation
 
@@ -138,7 +129,7 @@ dataset/
 
 ### Creating the Dataset Config
 
-Create a `config.toml` file in your project directory:
+Create a `dataset.toml` file in your project directory:
 
 ```toml
 [general]
@@ -252,8 +243,7 @@ sample_at_first = true
 
 **Key parameters explained:**
 
-- `network_dim`: Dimension of the LoRA (16-64, higher = more capacity but slower)
-- `network_alpha`: Should match network_dim for best results
+- `network_dim`: Dimension of the LoRA (8-16 usually suitable for simple styles, 32-64 for more complex concepts or characters)
 - `learning_rate`: 1e-4 is a good starting point (adjust if loss doesn't decrease)
 - `max_train_epochs`: How many training cycles (10-50 depending on dataset size)
 - `save_every_n_epochs`: How often to save checkpoints
@@ -339,10 +329,10 @@ Most tools that support Stable Diffusion LoRAs will work with Flux LoRAs. Look f
 
 If you get "out of memory" errors:
 
-- Reduce `batch_size` in `config.toml` (try 2 or 1)
+- Reduce `batch_size` in `dataset.toml` (try 2 or 1)
+- Try `optimizer_type = "adamw8bit"` in `training.toml`
 - Reduce `resolution` (try 768x768)
-- Reduce `network_dim` (try 8 instead of 16)
-- Reduce `max_data_loader_n_workers` (try 1 or 0)
+- Reduce `max_data_loader_n_workers` (try 1)
 
 ### Loss Doesn't Decrease
 
