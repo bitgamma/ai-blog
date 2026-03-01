@@ -78,6 +78,8 @@ Note that we download the base model instead of the distilled 4-step model. This
 
 After downloading, note the paths to your model files. You'll need them in the next steps.
 
+**Note**: If you already have a VAE and/or text encoder (either sharded or single file) that you are using with the distilled version of the model (for example in ComfyUI), you can use those files for the following steps instead of downloading them again.
+
 ## Project Creation
 
 We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and a standard musubi-tuner configuration for Klein 4B/9B
