@@ -5,11 +5,11 @@ pubDate: 'Feb 28 2026'
 heroImage: '../../assets/heros/blog-placeholder-5.jpg'
 ---
 
-This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide works as-is for both Flux.2 Klein 4B and 9B. For other models small adjustments will be needed they and will be addressed in future guides.
+This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide works as-is for both Flux.2 Klein 4B and 9B. For other models, small adjustments will be needed, and they will be addressed in future guides.
 
 ## Hardware Requirements
 
-This guide assumes a Strix Halo with 128GB of RAM for the default path. Refer to the [Out of VRAM](#out-of-vram) section if you are running into problems.
+This guide assumes a Strix Halo with 128GB of RAM for the default path. Refer to the [Out of VRAM](#out-of-vram) section if you run into problems.
 
 ## Prerequisites
 
@@ -30,9 +30,9 @@ sudo apt install uv git
 
 ## Installation
 
-Download the [musubi wrapper script](../../public/musubi-tuner/musubi.sh) and copy it where you want. This is a small script I created to simply the procedure. The script is easy to read so if you are curious have a look at what it does!
+Download the [musubi wrapper script](../../public/musubi-tuner/musubi.sh) and copy it where you want. This is a small script I created to simplify the procedure. The script is easy to read, so if you are curious, have a look at what it does!
 
-Now `cd` to the directory where the script. From there you will need to docs
+Now `cd` to the directory where the script is located. From there, you will need to:
 
 ```bash
 # Make the script executable
@@ -56,7 +56,7 @@ The script defaults to downloading dependencies for Strix Halo. This can also be
 export GFX_NAME="gfx1150"
 ```
 
-All overrides must be performed before running the `setup` step
+All overrides must be performed before running the `setup` step.
 
 ## Downloading Models
 
@@ -83,16 +83,16 @@ After downloading, note the paths to your model files. You'll need them in the n
 We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and a standard musubi-tuner configuration for Klein 4B/9B
 
 ```bash
-# Set the model version (e.g: klein-base-4b or klein-base-9b)
+# Set the model version (e.g., klein-base-4b or klein-base-9b)
 export MODEL_VERSION="klein-base-4b"
 
 # Set the path of the diffusion model (flux-2-klein-base-4b.safetensors or flux-2-klein-base-9b.safetensors)
 export DIT_MODEL="/path/to/dit/flux-2-klein-base-4b.safetensors"
 
-# Set the path to the first shard of the text_encoder (e.g: model-00001-of-00002.safetensors or and model-00001-of-00004.safetensors)
+# Set the path to the first shard of the text_encoder (e.g., model-00001-of-00002.safetensors or model-00001-of-00004.safetensors)
 export TEXT_ENCODER="/path/to/te/model-00001-of-00002.safetensors"
 
-# Set the path to the vae (eg: ae.safetensors)
+# Set the path to the VAE (e.g., ae.safetensors)
 export VAE_MODEL="/path/to/vae/ae.safetensors"
 
 # Set the project name. A folder with this name will be created
@@ -104,17 +104,17 @@ export PROJECT_NAME="my-lora"
 
 ## Dataset Preparation
 
-A good dataset is crucial for training a useful LoRA. Here are some technical advices and rules of thumb. Be ready to experiment:
+A good dataset is crucial for training a useful LoRA. Here are some technical advice and rules of thumb. Be ready to experiment:
 
 ### Adding Images
 
 Place your training images in the `dataset` directory of your project. Each image should have:
 
 - **File format:** PNG, JPG, or WEBP
-- **Resolution:** Aim for 1024x1024. Using a single resolutions for all images can reduce the number of batches, which is good
+- **Resolution:** Aim for 1024x1024. Using a single resolution for all images can reduce the number of batches, which is good
 - **Aspect ratio:** Square images work best but other ratios will work too
 
-As a rule of thumb anywhere from 20-200 images will work. The quality of the images is more important that the number.
+As a rule of thumb, anywhere from 20-200 images will work. The quality of the images is more important than the number.
 
 ### Adding Captions
 
@@ -131,12 +131,12 @@ dataset/
 
 **Caption rules of thumb:**
 
-- For styles: describring the scene but not the style works. I had good results with just empty captions.
+- For styles: describing the scene but not the style works. I had good results with just empty captions.
 - For characters: a trigger word + a short description seems to work well.
 
 ### Editing the Dataset Config
 
-In the project directory you will find a `dataset.toml` file. While usable as-is here is the explaination of some of its parameters:
+In the project directory, you will find a `dataset.toml` file. While usable as-is, here is the explanation of some of its parameters:
 
 - `resolution`: Target resolution for training
 - `batch_size`: How many images to process at once (reduce if you run out of VRAM)
@@ -159,13 +159,13 @@ Each line is a separate prompt that will be sampled during training. Adding as m
 
 Finally, let's explain some of the most relevant parameters from the `training.toml` in the project directory:
 
-- `network_dim`: Dimension of the LoRA (8-16 usually suitable for simple styles, 32-64 for more complex concepts or characters)
-- `learning_rate`: 1e-4 is a good starting point (adjust if loss doesn't decrease)
-- `max_train_epochs`: How many training cycles (10-50 depending on dataset size)
+- `network_dim`: Dimension of the LoRA (8-16 is usually suitable for simple styles, 32-64 for more complex concepts or characters)
+- `learning_rate`: 1e-4 is a good starting point (adjust if the loss doesn't decrease)
+- `max_train_epochs`: How many training cycles (10-50, depending on dataset size)
 - `save_every_n_epochs`: How often to save checkpoints
-- `save_state`: Saves the training state with each checkpoint. This allows stopping and resuming training. Consumes more disk space and VRAM
+- `save_state`: Saves the training state with each checkpoint. This allows stopping and resuming training. It consumes more disk space and VRAM
 
-Feel free to play with all parameters in the file. There is no correct recipe unfortunately and experimentation is essential.
+Feel free to play with all parameters in the file. There is no correct recipe, unfortunately, and experimentation is essential.
 
 ## Running Training
 
@@ -181,19 +181,19 @@ Feel free to play with all parameters in the file. There is no correct recipe un
 
 ## Resuming Training
 
-If you have stop the training, or feel that even after finishing the LoRA is undertrained, you can resume training if you set `save_state` to true (which is the default) in `training.toml`. To resume only run:
+If you have stopped the training or feel that the LoRA is undertrained even after finishing, you can resume training if you set `save_state` to true (which is the default) in `training.toml`. To resume, only run:
 
 ```bash
 ./musubi.sh train
 ```
 
-this will automatically find the latest saved state and restart training from there.
+This will automatically find the latest saved state and restart training from there.
 
 ## Monitoring Training
 
 During training, you'll see:
 
-1. **Loss values** - Should decrease over time. If it stays flat or increases, your learning rate may be too high. However do not rely too much on this value.
+1. **Loss values** - Should decrease over time. If it stays flat or increases, your learning rate may be too high. However, do not rely too much on this value.
 2. **Sample images** - Generated every 2 epochs (or whatever you set) showing how the LoRA is learning
 3. **Checkpoint files** - Saved to the `output` directory of the project every 2 epochs (or whatever you set)
 
@@ -206,7 +206,7 @@ During training, you'll see:
 | 10-20 | Check for overfitting (samples look too much like training images) |
 | 20+ | If loss is still decreasing, consider more epochs |
 
-However the best way to tell is to test the checkpoints that look promising with the distilled model using [ComfyUI](../comfyui/). I have found that often the last checkpoint is overtrained and prefer to use 2-4 epoch older checkpoints.
+However, the best way to tell is to test the checkpoints that look promising with the distilled model using [ComfyUI](../comfyui/). I have found that often the last checkpoint is overtrained, and I prefer to use 2-4 epoch older checkpoints.
 
 ## Using Your Trained LoRA
 
@@ -226,7 +226,7 @@ The final checkpoint won't have a sequence number.
 1. Place the `.safetensors` file in your ComfyUI `models/loras/` directory
 2. Add a `Load LoRA` node to your workflow
 3. Connect it to your Flux model nodes
-4. Adjust the LoRA strength. Start with 1.0 but don't be afraid to push it significantly higher or lower.
+4. Adjust the LoRA strength. Start with 1.0, but don't be afraid to push it significantly higher or lower.
 
 ### In other tools
 
