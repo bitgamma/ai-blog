@@ -5,7 +5,7 @@ pubDate: 'Feb 28 2026'
 heroImage: '../../assets/heros/blog-placeholder-5.jpg'
 ---
 
-This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo GPUs. We'll use Flux 2 Klein 4B as an example but all scripts and commands listed here also apply to Klein 9B. For other models small adjustments will be needed they and will be addressed in future guides.
+This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide works as-is for both Flux.2 Klein 4B and 9B. For other models small adjustments will be needed they and will be addressed in future guides.
 
 ## Hardware Requirements
 
@@ -30,82 +30,91 @@ sudo apt install uv git
 
 ## Installation
 
-Let's install musubi-tuner. We'll use a dedicated directory for this project:
+Download the [musubi wrapper script](../../public/musubi-tuner/musubi.sh) and copy it where you want. This is a small script I created to simply the procedure. The script is easy to read so if you are curious have a look at what it does!
+
+Now `cd` to the directory where the script. From there you will need to docs
 
 ```bash
-# Create a working directory
-mkdir -p ~/musubi-tuner-workspace
-cd ~/musubi-tuner-workspace
+# Make the script executable
+chmod +x musubi.sh
 
-# Clone the repository
-git clone https://github.com/kohya-ss/musubi-tuner/
-cd musubi-tuner
-
-# Create a Python virtual environment
-uv venv --python 3.12
-
-# Activate the virtual environment
-source .venv/bin/activate
-
-# Install musubi-tuner with AMD GPU support
-uv pip install -e . --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
-
-# Install torchvision with AMD GPU support
-uv pip install torchvision --extra-index-url https://rocm.nightlies.amd.com/v2-staging/gfx1151
+# Install musubi-tuner
+./musubi.sh setup
 ```
+
+By default this will install musubi-tuner in your home directory. You can override the install directory:
+
+```bash
+export MUSUBI_TUNER_INSTALL_DIR="/musubi/installation/path"
+```
+
+The script defaults to downloading dependencies for Strix Halo. This can also be overridden:
+
+```bash
+# You can check all available architectures here: https://rocm.nightlies.amd.com/v2-staging/
+# The example below is for Strix Point
+export GFX_NAME="gfx1150"
+```
+
+All overrides must be performed before running the `setup` step
 
 ## Downloading Models
 
-We need to download the Flux 2 Klein 4B model and its VAE (Autoencoder). The Klein repo's VAE is not compatible, so we need the VAE from the main Flux 2 dev repository.
+We need to download the Flux 2 Klein 4B or 9B model and its VAE (Autoencoder). The Klein repo's VAE is not compatible with musubi-tuner, so we need the VAE from the main Flux 2 dev repository.
 
-### Method 1: Using Hugging Face CLI (Recommended)
+Note that we download the base model instead of the distilled 4-step model. This is intentional. The created LoRAs will work with the distilled model as well.
 
-First, authenticate with Hugging Face:
-
-```bash
-# Get your token from https://huggingface.co/settings/tokens
-huggingface-cli login
-```
-
-Then download the models:
-
-```bash
-# Download the Klein 4B model (includes DiT and text encoder)
-huggingface-cli download black-forest-labs/FLUX.2-klein-base-4B --local-dir ~/.cache/flux-klein-4b
-
-# Download the VAE from Flux 2 dev (required for compatibility)
-huggingface-cli download black-forest-labs/FLUX.2-dev ae.safetensors --local-dir ~/.cache/flux-dev-vae
-```
-
-### Method 2: Using Your Browser
-
-If you prefer not to use the CLI:
+### Klein 4B
 
 1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B and download `flux-2-klein-base-4b.safetensors` + all `.safetensors` files from `text_encoder`
 2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev/tree/main and download `ae.safetensors`
 3. Place all files in appropriate directories
 
+### Klein 9B
+
+1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9B and download `flux-2-klein-base-9b.safetensors` + all `.safetensors` files from `text_encoder`
+2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev/tree/main and download `ae.safetensors`
+3. Place all files in appropriate directories
+
 After downloading, note the paths to your model files. You'll need them in the next steps.
+
+## Project Creation
+
+We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and a standard musubi-tuner configuration for Klein 4B/9B
+
+```bash
+# Set the model version (e.g: klein-base-4b or klein-base-9b)
+export MODEL_VERSION="klein-base-4b"
+
+# Set the path of the diffusion model (flux-2-klein-base-4b.safetensors or flux-2-klein-base-9b.safetensors)
+export DIT_MODEL="/path/to/dit/flux-2-klein-base-4b.safetensors"
+
+# Set the path to the first shard of the text_encoder (e.g: model-00001-of-00002.safetensors or and model-00001-of-00004.safetensors)
+export TEXT_ENCODER="/path/to/te/model-00001-of-00002.safetensors"
+
+# Set the path to the vae (eg: ae.safetensors)
+export VAE_MODEL="/path/to/vae/ae.safetensors"
+
+# Set the project name. A folder with this name will be created
+export PROJECT_NAME="my-lora"
+
+# Create the project
+./musubi.sh create_flux2
+```
 
 ## Dataset Preparation
 
-A good dataset is crucial for training a useful LoRA. Here's how to prepare one:
-
-### Creating the Dataset Directory
-
-```bash
-mkdir -p ~/my-lora/dataset
-mkdir -p ~/my-lora/cache
-mkdir -p ~/my-lora/output
-```
+A good dataset is crucial for training a useful LoRA. Here are some technical advices and rules of thumb. Be ready to experiment:
 
 ### Adding Images
 
-Place your training images in the `dataset` directory. Each image should have:
+Place your training images in the `dataset` directory of your project. Each image should have:
 
 - **File format:** PNG, JPG, or WEBP
-- **Resolution:** At least 1024x1024 (the model will resize during training)
-- **Aspect ratio:** Square images work best for Flux models
+- **Resolution:** Aim for 1024x1024. Using a single resolutions for all images can reduce the number of batches, which is good
+- **Aspect ratio:** Square images work best but other ratios will work too
+
+As a rule of thumb anywhere from 20-200 images will work. The quality of the images is more important that the number.
 
 ### Adding Captions
 
@@ -120,32 +129,14 @@ dataset/
 └── ...
 ```
 
-**Caption best practices:**
+**Caption rules of thumb:**
 
-- Be specific about the style you want to teach
-- Include key visual elements (colors, lighting, composition)
-- Use consistent terminology
-- Example: "a portrait of a woman with red hair, cinematic lighting, detailed eyes, highly detailed, 8k"
+- For styles: describring the scene but not the style works. I had good results with just empty captions.
+- For characters: a trigger word + a short description seems to work well.
 
-### Creating the Dataset Config
+### Editing the Dataset Config
 
-Create a `dataset.toml` file in your project directory:
-
-```toml
-[general]
-resolution = [1024, 1024]
-caption_extension = ".txt"
-batch_size = 4
-enable_bucket = true
-bucket_no_upscale = true
-
-[[datasets]]
-image_directory = "~/my-lora/dataset"
-cache_directory = "~/my-lora/cache"
-num_repeats = 1
-```
-
-**Config explanation:**
+In the project directory you will find a `dataset.toml` file. While usable as-is here is the explaination of some of its parameters:
 
 - `resolution`: Target resolution for training
 - `batch_size`: How many images to process at once (reduce if you run out of VRAM)
@@ -154,138 +145,57 @@ num_repeats = 1
 
 ## Creating Reference Prompts
 
-Reference prompts are used to generate sample images during training, so you can see how the LoRA is progressing.
+Another notable file is called `reference_prompts.txt`. Reference prompts are used to generate sample images during training, so you can see how the LoRA is progressing.
 
-Create a file called `reference_prompts.txt`:
+Example with a single prompt:
 
 ```
-a portrait of a woman with red hair, cinematic lighting, detailed eyes
-a landscape with mountains at sunset, vibrant colors
-a cat sitting on a windowsill, realistic lighting
-a cyberpunk city street at night, neon lights
+A close-up portrait by mikkoph of a very young woman with fair skin and striking blue eyes, looking directly at the camera with a soft, serene expression. Her blonde hair is styled in an elegant updo, adorned with numerous small white flowers, possibly daisies, nestled throughout the curls. She wears a floral-patterned blouse with black, white, and gold flowers, a pearl earring in her right ear, and has a manicure with white nail polish. Her hands are gently cupped around her face, with her fingers lightly touching her cheeks. The background is a deep, dark blue, creating a dramatic contrast that highlights her features and the delicate details of her look. --w 1024 --h 1024 --d 42 --s 40
 ```
 
-Each line is a separate prompt that will be sampled during training.
-
-## Caching Latents
-
-Before training, we need to preprocess the images by encoding them into latents (a compressed representation the model uses). This step can take some time but makes training much faster.
-
-```bash
-# Set environment variables for AMD GPU optimization
-export MIOPEN_FIND_MODE=FAST
-export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
-export TORCH_BLAS_PREFER_HIPBLASLT=1
-
-# Cache latents
-python flux_2_cache_latents.py \
-    --dataset_config ~/my-lora/config.toml \
-    --vae ~/.cache/flux-dev-vae/ae.safetensors \
-    --model_version klein-base-4b \
-    --disable_cudnn_backend
-```
-
-You can ignore any warnings about cuDNN being disabled.
-
-## Caching Text Encoder Outputs
-
-Next, we cache the text encoder outputs - this converts your captions into numerical representations the model can understand.
-
-```bash
-python flux_2_cache_text_encoder_outputs.py \
-    --dataset_config ~/my-lora/config.toml \
-    --text_encoder ~/.cache/flux-klein-4b/text_encoder/model-00001-of-00002.safetensors \
-    --batch_size 16 \
-    --model_version klein-base-4b
-```
+Each line is a separate prompt that will be sampled during training. Adding as many as you need, but keep in mind that this will make the training session longer.
 
 ## Training Configuration
 
-Now let's set up our training configuration. Create a file called `training.toml`:
-
-```toml
-[general]
-model_version = "klein-base-4b"
-dit = "/home/flux-klein-4b/flux-2-klein-base-4b.safetensors"
-vae = "/home/flux-dev-vae/ae.safetensors"
-text_encoder = "/home/flux-klein-4b/text_encoder/model-00001-of-00002.safetensors"
-dataset_config = "/home/my-lora/config.toml"
-persistent_data_loader_workers = true
-max_data_loader_n_workers = 2
-compile = true
-compile_mode = "default"
-
-[network]
-network_module = "networks.lora_flux_2"
-network_dim = 16
-network_alpha = 16
-
-[optimizer]
-optimizer_type = "AdamW"
-learning_rate = 1e-4
-
-[training]
-seed = 42
-max_train_epochs = 30
-save_every_n_epochs = 2
-mixed_precision = "bf16"
-sdpa = true
-timestep_sampling = "flux2_shift"
-weighting_scheme = "none"
-
-[output]
-output_dir = "/home/my-lora/output"
-output_name = "my-lora"
-sample_prompts = "~/my-lora/reference_prompts.txt"
-sample_every_n_epochs = 2
-sample_at_first = true
-```
-
-**Key parameters explained:**
+Finally, let's explain some of the most relevant parameters from the `training.toml` in the project directory:
 
 - `network_dim`: Dimension of the LoRA (8-16 usually suitable for simple styles, 32-64 for more complex concepts or characters)
 - `learning_rate`: 1e-4 is a good starting point (adjust if loss doesn't decrease)
 - `max_train_epochs`: How many training cycles (10-50 depending on dataset size)
 - `save_every_n_epochs`: How often to save checkpoints
+- `save_state`: Saves the training state with each checkpoint. This allows stopping and resuming training. Consumes more disk space and VRAM
+
+Feel free to play with all parameters in the file. There is no correct recipe unfortunately and experimentation is essential.
 
 ## Running Training
 
-### Option 1: Direct Command
-
 ```bash
-accelerate launch --num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py \
-    --model_version klein-base-4b \
-    --dit ~/.cache/flux-klein-4b/flux-2-klein-base-4b.safetensors \
-    --vae ~/.cache/flux-dev-vae/ae.safetensors \
-    --text_encoder ~/.cache/flux-klein-4b/text_encoder/model-00001-of-00002.safetensors \
-    --dataset_config ~/my-lora/config.toml \
-    --sdpa --mixed_precision bf16 \
-    --timestep_sampling flux2_shift --weighting_scheme none \
-    --optimizer_type adamw --learning_rate 1e-4 \
-    --max_data_loader_n_workers 2 --persistent_data_loader_workers \
-    --network_module networks.lora_flux_2 --network_dim 16 \
-    --max_train_epochs 30 --save_every_n_epochs 2 --seed 42 \
-    --output_dir ~/my-lora/output --output_name my-lora \
-    --compile --compile_mode default \
-    --sample_prompts ~/my-lora/reference_prompts.txt --sample_every_n_epochs 2 --sample_at_first
+# Cache latents and prompts. This speeds up training considerably
+./musubi.sh cache
+
+# Run the training
+./musubi.sh train
 ```
 
-### Option 2: Using the Training Config
+**Note:** You are likely to see many warnings when running this command. They are harmless and can be ignored.
+
+## Resuming Training
+
+If you have stop the training, or feel that even after finishing the LoRA is undertrained, you can resume training if you set `save_state` to true (which is the default) in `training.toml`. To resume only run:
 
 ```bash
-accelerate launch --num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py \
-    --config_file ~/my-lora/training.toml
+./musubi.sh train
 ```
 
-**Note:** The first run will compile the model, which takes several minutes. Subsequent runs will be faster.
+this will automatically find the latest saved state and restart training from there.
 
 ## Monitoring Training
 
 During training, you'll see:
 
-1. **Loss values** - Should decrease over time. If it stays flat or increases, your learning rate may be too high.
+1. **Loss values** - Should decrease over time. If it stays flat or increases, your learning rate may be too high. However do not rely too much on this value.
 2. **Sample images** - Generated every 2 epochs (or whatever you set) showing how the LoRA is learning
-3. **Checkpoint files** - Saved to `~/my-lora/output` every 2 epochs
+3. **Checkpoint files** - Saved to the `output` directory of the project every 2 epochs (or whatever you set)
 
 ### What to Look For
 
@@ -296,9 +206,7 @@ During training, you'll see:
 | 10-20 | Check for overfitting (samples look too much like training images) |
 | 20+ | If loss is still decreasing, consider more epochs |
 
-### Early Stopping
-
-If the loss stops decreasing or starts increasing, you can stop training early. Overfitting means the LoRA is memorizing your dataset rather than learning generalizable style patterns.
+However the best way to tell is to test the checkpoints that look promising with the distilled model using [ComfyUI](../comfyui/). I have found that often the last checkpoint is overtrained and prefer to use 2-4 epoch older checkpoints.
 
 ## Using Your Trained LoRA
 
@@ -311,13 +219,14 @@ output/
 ├── my-lora-000006.safetensors    # Epoch 6 checkpoint
 └── ...
 ```
+The final checkpoint won't have a sequence number.
 
 ### In ComfyUI
 
 1. Place the `.safetensors` file in your ComfyUI `models/loras/` directory
 2. Add a `Load LoRA` node to your workflow
 3. Connect it to your Flux model nodes
-4. Adjust the LoRA strength (start with 0.5-1.0)
+4. Adjust the LoRA strength. Start with 1.0 but don't be afraid to push it significantly higher or lower.
 
 ### In other tools
 
@@ -334,45 +243,11 @@ If you get "out of memory" errors:
 - Reduce `resolution` (try 768x768)
 - Reduce `max_data_loader_n_workers` (try 1)
 
-### Loss Doesn't Decrease
-
-- Increase `learning_rate` (try 2e-4 or 3e-4)
-- Check your captions are meaningful and consistent
-- Train for more epochs
-
 ### Samples Look Bad
 
 - Train for more epochs (style may need time to emerge)
 - Check your dataset quality (images should be clear, captions should be good)
 - Try a different `network_dim` (higher for complex styles)
-
-### Compilation Takes Too Long
-
-The first run compiles the model, which can take 5-10 minutes. This is normal. Subsequent runs will be much faster.
-
-## Automation Script
-
-For convenience, we've created a modular shell script that automates the training workflow. You can find it at [`scripts/train-lora.sh`](../scripts/train-lora.sh).
-
-### Features
-
-- **User-provided paths**: You specify your dataset, cache, and output directories
-- **Flexible model support**: Specify the 3 model files (diffusion, text encoder, VAE) separately - works with any Flux model
-- **Automatic setup**: Checks for dependencies, installs musubi-tuner, creates venv, and activates it automatically
-- **Validation**: Verifies all inputs and model files exist before proceeding
-
-### Usage
-
-1. Copy the script to your project directory
-2. Edit the configuration section at the top of the script:
-   - Set `PROJECT_DIR`, `DATASET_DIR`, `CACHE_DIR`, `OUTPUT_DIR`
-   - Set paths to your model files: `DIT_MODEL`, `VAE_MODEL`, `TEXT_ENCODER`
-3. Run `./train-lora.sh` to set up everything
-4. Add your training images to the dataset directory
-5. Run `./train-lora.sh cache` to preprocess data
-6. Run `./train-lora.sh train` to start training
-
-See the script file for detailed configuration options.
 
 ## Conclusion
 
@@ -381,7 +256,6 @@ You now have a complete workflow for training custom LoRAs with musubi-tuner on 
 For more information, check out:
 
 - [Musubi-Tuner GitHub](https://github.com/kohya-ss/musubi-tuner)
-- [Hugging Face Flux Documentation](https://huggingface.co/docs/transformers/model_doc/flux)
 - [LoRA Theory and Practice](https://arxiv.org/abs/2106.09685)
 
 Happy training!

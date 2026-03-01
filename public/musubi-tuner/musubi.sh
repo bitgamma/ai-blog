@@ -18,8 +18,8 @@ VAE_MODEL="${VAE_MODEL:-}"  # Path to VAE model (e.g., ae.safetensors)
 TEXT_ENCODER="${TEXT_ENCODER:-}"  # Path to text encoder model (e.g., model-00001-of-00002.safetensors)
 
 # Project configuration
-PROJECT_NAME="${PROJECT_NAME:-my-lora}"  # Name for your project
-MODEL_VERSION="${MODEL_VERSION:-klein-base-4b}"  # Model version: "klein-base-4b" or "klein-base-9b"
+PROJECT_NAME="${PROJECT_NAME:-}"  # Name for your project (e.g: my-lora)
+MODEL_VERSION="${MODEL_VERSION:-}"  # Model version: "klein-base-4b" or "klein-base-9b"
 
 # Training parameters
 NETWORK_DIM="${NETWORK_DIM:-16}"
@@ -268,7 +268,6 @@ learning_rate = ${LEARNING_RATE}
 [training]
 seed = 42
 max_train_epochs = ${MAX_EPOCHS}
-save_every_n_epochs = ${SAVE_EVERY_N}
 mixed_precision = "bf16"
 sdpa = true
 timestep_sampling = "flux2_shift"
@@ -277,6 +276,8 @@ weighting_scheme = "none"
 [output]
 output_dir = "${OUTPUT_DIR}"
 output_name = "${PROJECT_NAME}"
+save_every_n_epochs = ${SAVE_EVERY_N}
+save_state = true
 sample_prompts = "${PROJECT_DIR}/reference_prompts.txt"
 sample_every_n_epochs = ${SAVE_EVERY_N}
 sample_at_first = true
@@ -358,7 +359,7 @@ train_lora() {
     
     log_info "Starting training..."
     
-    ACCELERATE_ARGS="--num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py --config_file ${PROJECT_DIR}/training.toml --save_state"
+    ACCELERATE_ARGS="--num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py --config_file ${PROJECT_DIR}/training.toml"
     
     if [ -n "$RESUME_PATH" ]; then
         log_info "Resuming from checkpoint: ${RESUME_PATH}"
