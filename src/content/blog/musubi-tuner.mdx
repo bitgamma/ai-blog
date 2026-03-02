@@ -117,7 +117,7 @@ export VAE_MODEL="/path/to/vae/ae.safetensors"
 export PROJECT_NAME="my-lora"
 
 # Create the project
-./musubi.sh create-flux2
+./musubi.sh create
 ```
 
 ## Dataset Preparation
@@ -277,7 +277,7 @@ Here are some examples images generated using my LoRA. They are generated with t
 
 If you get "out of memory" errors:
 
-- Reduce `batch_size` in `dataset.toml` (try 2 or 1)
+- Reduce `batch_size` in `dataset.toml`
 - Try `optimizer_type = "adamw8bit"` in `training.toml`
 - Reduce `resolution` (try 768x768)
 - Reduce `max_data_loader_n_workers` (try 1)

@@ -19,14 +19,14 @@ TEXT_ENCODER="${TEXT_ENCODER:-}"  # Path to text encoder model (e.g., model-0000
 
 # Project configuration
 PROJECT_NAME="${PROJECT_NAME:-}"  # Name for your project (e.g: my-lora)
-MODEL_VERSION="${MODEL_VERSION:-}"  # Model version: "klein-base-4b" or "klein-base-9b"
+MODEL_VERSION="${MODEL_VERSION:-}"  # Model version: "klein-base-4b", "klein-base-9b", "z-image"
 
 # Training parameters
-NETWORK_DIM="${NETWORK_DIM:-16}"
+NETWORK_DIM="${NETWORK_DIM:-32}"
 LEARNING_RATE="${LEARNING_RATE:-1e-4}"
 MAX_EPOCHS="${MAX_EPOCHS:-30}"
 SAVE_EVERY_N="${SAVE_EVERY_N:-2}"
-BATCH_SIZE="${BATCH_SIZE:-4}"
+BATCH_SIZE="${BATCH_SIZE:-2}"
 RESOLUTION="${RESOLUTION:-1024}"
 
 # ======================================================
@@ -37,6 +37,14 @@ PROJECT_DIR="${PWD}/${PROJECT_NAME}"
 DATASET_DIR="${PROJECT_DIR}/dataset"
 CACHE_DIR="${PROJECT_DIR}/cache"
 OUTPUT_DIR="${PROJECT_DIR}/output"
+
+TRAINING_SCRIPT=""
+CACHE_LATENT_SCRIPT=""
+CACHE_TEXT_ENCODER_SCRIPT=""
+NETWORK_NAME=""
+TIMESTEP_SAMPLING=""
+EXTRA_TRAINING_CONFIG=""
+EXTRA_CACHING_ARGS=""
 
 # Colors for output
 RED='\033[0;31m'
@@ -58,6 +66,36 @@ log_error() {
 
 # Initialize environment (export AMD GPU settings + ensure venv is active)
 init_env() {
+    # Check if project name is set
+    if [ -z "$PROJECT_NAME" ]; then
+        log_error "PROJECT_NAME is not set. Please set it in the configuration section."
+        exit 1
+    fi
+
+    case "$MODEL_VERSION" in
+        klein-base-4b|klein-base-9b) 
+            TRAINING_SCRIPT="flux_2_train_network.py"
+            CACHE_LATENT_SCRIPT="flux_2_cache_latents.py"
+            CACHE_TEXT_ENCODER_SCRIPT="flux_2_cache_text_encoder_outputs.py"
+            NETWORK_NAME="networks.lora_flux_2"
+            TIMESTEP_SAMPLING="flux2_shift"
+            EXTRA_TRAINING_CONFIG="model_version = \"${MODEL_VERSION}\""
+            EXTRA_CACHING_ARGS="--model_version \"${MODEL_VERSION}\""
+            ;;
+        z-image)
+            TRAINING_SCRIPT="zimage_train_network.py"
+            CACHE_LATENT_SCRIPT="zimage_cache_latents.py"
+            CACHE_TEXT_ENCODER_SCRIPT="zimage_cache_text_encoder_outputs.py"
+            NETWORK_NAME="networks.lora_zimage"
+            TIMESTEP_SAMPLING="shift"
+            EXTRA_TRAINING_CONFIG="discrete_flow_shift = 2.0"
+            ;;
+        *)
+            log_error "MODEL_VERSION must be 'klein-base-4b', 'klein-base-9b' or 'z-image'."
+            exit 1
+            ;;
+    esac    
+
     export MIOPEN_FIND_MODE=FAST
     export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
     export TORCH_BLAS_PREFER_HIPBLASLT=1
@@ -125,18 +163,6 @@ setup_musubi_tuner() {
 # Validate user inputs
 validate_inputs() {
     log_info "Validating inputs..."
-    
-    # Check if project name is set
-    if [ -z "$PROJECT_NAME" ]; then
-        log_error "PROJECT_NAME is not set. Please set it in the configuration section."
-        exit 1
-    fi
-    
-    # Check if model version is valid
-    if [ "$MODEL_VERSION" != "klein-base-4b" ] && [ "$MODEL_VERSION" != "klein-base-9b" ]; then
-        log_error "MODEL_VERSION must be 'klein-base-4b' or 'klein-base-9b'."
-        exit 1
-    fi
     
     # Check if model files are set
     if [ -z "$DIT_MODEL" ]; then
@@ -247,7 +273,6 @@ create_training_config() {
     
     cat > "${PROJECT_DIR}/training.toml" << EOF
 [general]
-model_version = "${MODEL_VERSION}"
 dit = "${DIT_MODEL}"
 vae = "${VAE_MODEL}"
 text_encoder = "${TEXT_ENCODER}"
@@ -258,7 +283,7 @@ compile = true
 compile_mode = "default"
 
 [network]
-network_module = "networks.lora_flux_2"
+network_module = "${NETWORK_NAME}"
 network_dim = ${NETWORK_DIM}
 
 [optimizer]
@@ -270,8 +295,9 @@ seed = 42
 max_train_epochs = ${MAX_EPOCHS}
 mixed_precision = "bf16"
 sdpa = true
-timestep_sampling = "flux2_shift"
+timestep_sampling = "${TIMESTEP_SAMPLING}"
 weighting_scheme = "none"
+${EXTRA_TRAINING_CONFIG}
 
 [output]
 output_dir = "${OUTPUT_DIR}"
@@ -286,17 +312,18 @@ EOF
     log_info "Training config created at ${PROJECT_DIR}/training.toml"
 }
 
-# Create Flux2 project (directories + configs)
-create_flux2() {
-    log_info "Creating Flux2 project..."
-    
+# Create Musubi-Tuner project (directories + configs)
+create() {
+    log_info "Creating project..."
+    init_env
+
     validate_inputs
     create_project_dirs
     create_dataset_config
     create_reference_prompts
     create_training_config
     
-    log_info "Flux2 project created successfully at ${PROJECT_DIR}"
+    log_info "LoRA training project created successfully at ${PROJECT_DIR}"
 
     echo "Next steps:"
     echo "1. Add your training images to: ${DATASET_DIR}"
@@ -316,11 +343,11 @@ cache_latents() {
     
     log_info "Caching latents..."
     
-    python flux_2_cache_latents.py \
+    python "${CACHE_LATENT_SCRIPT}" \
         --dataset_config "${PROJECT_DIR}/dataset.toml" \
         --vae "${VAE_MODEL}" \
-        --model_version "${MODEL_VERSION}" \
-        --disable_cudnn_backend
+        --disable_cudnn_backend \
+        ${EXTRA_CACHING_ARGS}
     
     log_info "Latents cached successfully."
 }
@@ -332,11 +359,11 @@ cache_text_encoders() {
     
     log_info "Caching text encoder outputs..."
     
-    python flux_2_cache_text_encoder_outputs.py \
+    python "${CACHE_TEXT_ENCODER_SCRIPT}" \
         --dataset_config "${PROJECT_DIR}/dataset.toml" \
         --text_encoder "${TEXT_ENCODER}" \
         --batch_size 16 \
-        --model_version "${MODEL_VERSION}"
+        ${EXTRA_CACHING_ARGS}
     
     log_info "Text encoder outputs cached successfully."
 }
@@ -356,10 +383,10 @@ train_lora() {
             log_info "Found checkpoint with highest sequence: ${RESUME_PATH}"
         fi
     fi
-    
+
     log_info "Starting training..."
-    
-    ACCELERATE_ARGS="--num_cpu_threads_per_process 1 --mixed_precision bf16 flux_2_train_network.py --config_file ${PROJECT_DIR}/training.toml"
+
+    ACCELERATE_ARGS="--num_cpu_threads_per_process 1 --mixed_precision bf16 ${TRAINING_SCRIPT} --config_file ${PROJECT_DIR}/training.toml"
     
     if [ -n "$RESUME_PATH" ]; then
         log_info "Resuming from checkpoint: ${RESUME_PATH}"
@@ -374,15 +401,15 @@ train_lora() {
 
 # Help function
 help() {
-    echo "Usage: $0 {setup|create-flux2|cache|train}"
+    echo "Usage: $0 {setup|create|cache|train}"
 }
 
 case "$1" in
     setup)
         setup_musubi_tuner
         ;;
-    create-flux2)
-        create_flux2
+    create)
+        create
         ;;
     cache)
         cache_latents
