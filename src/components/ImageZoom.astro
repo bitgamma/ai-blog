@@ -1,0 +1,101 @@
+---
+import Image from "astro/components/Image.astro"
+import type { ComponentProps } from "astro/types";
+type ImageProps = ComponentProps<typeof Image>;
+const props = Astro.props;
+const id = Math.random().toString(36).slice(2, 11);
+---
+
+<div class="original-image-container">
+  <img src={props.src.src as string} alt={props.alt} width={props.width} height={props.heigth} id=`image-zoom-${id}` class="original-image">
+  <div class="display-hidden" id=`image-${id}-zoomed`>
+    <img src={props.src.src as string} alt={props.alt} width={props.width} height={props.heigth} id=`image-zoom-${props.id}`>
+  </div>
+</div>
+<script define:vars={{id}}>
+  const imageToZoom = document.getElementById(`image-zoom-${id}`);
+  const zoomContainer = document.getElementById(`image-${id}-zoomed`);
+  const zoomContainers = document.getElementsByClassName('image-zoom');
+  
+  imageToZoom.addEventListener('click', () => {
+    for (var zContainer of zoomContainers) {
+      if(zContainer.classList.contains('image-zoom')) {
+        zContainer.classList.add('display-hidden');
+        zContainer.classList.remove('image-zoom');
+      }
+    }
+
+    if(zoomContainer.classList.contains('image-zoom')) {
+      zoomContainer.classList.add('display-hidden');
+      zoomContainer.classList.remove('image-zoom');
+    } else {
+      zoomContainer.classList.add('image-zoom');
+      zoomContainer.classList.remove('display-hidden');
+    }
+  });
+
+  zoomContainer.addEventListener("click", () => {
+    zoomContainer.classList.add('display-hidden');
+    zoomContainer.classList.remove('image-zoom');
+  });
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      zoomContainer.classList.add('display-hidden');
+      zoomContainer.classList.remove('image-zoom');
+    }
+  });
+
+</script>
+<style>
+  .original-image-container {
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+  }
+
+  .original-image {
+    cursor: -moz-zoom-in; 
+    cursor: -webkit-zoom-in; 
+    cursor: zoom-in;
+  }
+
+  .image-zoom {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--black-transparent);
+    z-index: 999;
+    width: 100%;
+    cursor: -moz-zoom-out; 
+    cursor: -webkit-zoom-out; 
+    cursor: zoom-out;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    backdrop-filter: blur(10px);
+  }
+
+  .image-zoom img {
+    width: 500px;
+  }
+
+  .display-hidden {
+    display: none;
+  }
+
+  @media (max-width: 720px) {
+      .image-zoom {
+        width: 100%;
+      }
+
+      .image-zoom img {
+        width: 300px;
+      }
+  }
+</style>

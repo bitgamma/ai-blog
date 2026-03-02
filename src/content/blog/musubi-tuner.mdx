@@ -4,6 +4,7 @@ description: 'A comprehensive guide to train Flux.2 Klein 4B/9B LoRAs on AMD Str
 pubDate: 'Feb 28 2026'
 ---
 import { Image } from "astro:assets";
+import ImageZoom from '../../components/ImageZoom.astro';
 import loraTrainingEpoch00 from "../../assets/musubi-tuner/lora-training-epoch00.png";
 import loraTrainingEpoch06 from "../../assets/musubi-tuner/lora-training-epoch06.png";
 import loraTrainingEpoch12 from "../../assets/musubi-tuner/lora-training-epoch12.png";
@@ -227,7 +228,7 @@ Here are some examples from my training:
 
 | Epoch 0 | Epoch 6 | Epoch 12 | Epoch 20 | Epoch 30  |
 |-----------------|---------|----------|----------|------------------------|
-| <Image src={loraTrainingEpoch00} width={180} alt="Epoch 0 (Start) - Training loss and sample images at the beginning of training" /> | <Image src={loraTrainingEpoch06} width={180} alt="Epoch 6 - Early learning phase showing initial style emergence" /> | <Image src={loraTrainingEpoch12} width={180} alt="Epoch 12 - Mid-training with clearer style development" /> | <Image src={loraTrainingEpoch20} width={180} alt="Epoch 20 - Best checkpoint with optimal style quality" /> | <Image src={loraTrainingEpoch30} width={180} alt="Epoch 30 - Overtrained checkpoint with degraded quality" /> |
+| <ImageZoom src={loraTrainingEpoch00} width={180} alt="Epoch 0 (Start) - Training loss and sample images at the beginning of training" /> | <ImageZoom src={loraTrainingEpoch06} width={180} alt="Epoch 6 - Early learning phase showing initial style emergence" /> | <ImageZoom src={loraTrainingEpoch12} width={180} alt="Epoch 12 - Mid-training with clearer style development" /> | <ImageZoom src={loraTrainingEpoch20} width={180} alt="Epoch 20 - Best checkpoint with optimal style quality" /> | <ImageZoom src={loraTrainingEpoch30} width={180} alt="Epoch 30 - Overtrained checkpoint with degraded quality" /> |
 | Start | Early learning | Mid-training | Best checkpoint | Overtrained |
 
 The last checkpoint is clearly overtrained and quality degraded significantly. I used checkpoint 20 instead.
@@ -264,11 +265,11 @@ Here are some examples images generated using my LoRA. They are generated with t
 
 | With LoRA | Without LoRA |
 |-----------|--------------|
-| <Image src={portrait1Lora} width={340} alt="Portrait 1 with LoRA" /> | <Image src={portrait1NoLora} width={340} alt="Portrait 1 without LoRA" /> |
-| <Image src={portrait2Lora} width={340} alt="Portrait 2 with LoRA" /> | <Image src={portrait2NoLora} width={340} alt="Portrait 2 without LoRA" /> |
-| <Image src={portrait3Lora} width={340} alt="Portrait 3 with LoRA" /> | <Image src={portrait3NoLora} width={340} alt="Portrait 3 without LoRA" /> |
-| <Image src={portrait4Lora} width={340} alt="Portrait 4 with LoRA" /> | <Image src={portrait4NoLora} width={340} alt="Portrait 4 without LoRA" /> |
-| <Image src={portrait5Lora} width={340} alt="Portrait 5 with LoRA" /> | <Image src={portrait5NoLora} width={340} alt="Portrait 5 without LoRA" /> |
+| <ImageZoom src={portrait1Lora} width={340} alt="Portrait 1 with LoRA"/> | <ImageZoom src={portrait1NoLora} width={340} alt="Portrait 1 without LoRA"/> |
+| <ImageZoom src={portrait2Lora} width={340} alt="Portrait 2 with LoRA" /> | <ImageZoom src={portrait2NoLora} width={340} alt="Portrait 2 without LoRA" /> |
+| <ImageZoom src={portrait3Lora} width={340} alt="Portrait 3 with LoRA" /> | <ImageZoom src={portrait3NoLora} width={340} alt="Portrait 3 without LoRA" /> |
+| <ImageZoom src={portrait4Lora} width={340} alt="Portrait 4 with LoRA" /> | <ImageZoom src={portrait4NoLora} width={340} alt="Portrait 4 without LoRA" /> |
+| <ImageZoom src={portrait5Lora} width={340} alt="Portrait 5 with LoRA" /> | <ImageZoom src={portrait5NoLora} width={340} alt="Portrait 5 without LoRA" /> |
 
 ## Troubleshooting
 
