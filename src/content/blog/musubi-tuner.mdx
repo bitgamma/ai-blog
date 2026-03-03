@@ -273,6 +273,23 @@ Here are some examples images generated using my LoRA. They are generated with t
 <ComparisonSlider beforeImage={portrait4NoLora} afterImage={portrait4Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
 <ComparisonSlider beforeImage={portrait5NoLora} afterImage={portrait5Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
 
+## Merging Checkpoints with EMA
+
+The `musubi.sh` script includes an `ema` command that performs **Exponential Moving Average (EMA) merging** of LoRA checkpoints. This post-training technique combines multiple checkpoints into a single, often improved checkpoint.
+
+EMA works by applying a weighted average to checkpoint parameters, where a `beta` value (default: 0.95) controls the weighting between earlier and later checkpoints. This can be useful when:
+
+- You have multiple promising checkpoints but are unsure which is optimal
+- Training showed consistent improvement across epochs
+- You want to avoid testing each checkpoint individually
+
+**Usage:**
+```bash
+./musubi.sh ema output/my-lora-000016.safetensors output/my-lora-000018.safetensors output/my-lora-000020.safetensors --output_file my-lora-ema.safetensors
+```
+
+You can also adjust the `beta` parameter (e.g., `--beta 0.97`) to give more or less weight to earlier checkpoints. Note that EMA works best when checkpoints are from similar training phases and show consistent improvement.
+
 ## Troubleshooting
 
 ### Out of VRAM
