@@ -401,44 +401,43 @@ train_lora() {
 
 # Convert z-image LoRA for ComfyUI compatibility
 convert_lora() {
-    local INPUT_PATH="$1"
-    local OUTPUT_PATH="$2"
-    
-    # Auto-detect latest checkpoint if not provided
-    if [ -z "$INPUT_PATH" ]; then
-        INPUT_PATH=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "${PROJECT_NAME}*.safetensors" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
+    # Auto-detect latest checkpoint if no arguments provided
+    if [ $# -eq 0 ]; then
+        local INPUT_PATH=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "${PROJECT_NAME}*.safetensors" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
         
         if [ -z "$INPUT_PATH" ]; then
             log_error "No LoRA checkpoint found in ${OUTPUT_DIR}"
-            log_info "Usage: $0 convert [checkpoint_path] [--output output_path]"
+            log_info "Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
             return 1
         fi
         
         log_info "No checkpoint specified. Using latest: ${INPUT_PATH}"
+        set -- "$INPUT_PATH"
     fi
     
-    # Validate input exists
-    if [ ! -f "$INPUT_PATH" ]; then
-        log_error "Checkpoint not found: $INPUT_PATH"
-        return 1
-    fi
-    
-    # Auto-generate output path if not provided
-    if [ -z "$OUTPUT_PATH" ]; then
+    # Process all provided input paths
+    for INPUT_PATH in "$@"; do
+        # Validate input exists
+        if [ ! -f "$INPUT_PATH" ]; then
+            log_error "Checkpoint not found: $INPUT_PATH"
+            continue
+        fi
+        
+        # Auto-generate output path
         local BASENAME=$(basename "$INPUT_PATH" .safetensors)
-        OUTPUT_PATH="${OUTPUT_DIR}/${BASENAME}_comfyui.safetensors"
-    fi
-    
-    log_info "Converting z-image LoRA for ComfyUI compatibility..."
-    log_info "Input:  ${INPUT_PATH}"
-    log_info "Output: ${OUTPUT_PATH}"
-    
-    python "convert_lora.py" \
-        --input "$INPUT_PATH" \
-        --output "$OUTPUT_PATH" \
-        --target "other"
-    
-    log_info "Conversion complete!"
+        local OUTPUT_PATH="${OUTPUT_DIR}/${BASENAME}_comfyui.safetensors"
+        
+        log_info "Converting z-image LoRA for ComfyUI compatibility..."
+        log_info "Input:  ${INPUT_PATH}"
+        log_info "Output: ${OUTPUT_PATH}"
+        
+        python "convert_lora.py" \
+            --input "$INPUT_PATH" \
+            --output "$OUTPUT_PATH" \
+            --target "other"
+        
+        log_info "Conversion complete!"
+    done
 }
 
 # Help function
@@ -451,7 +450,7 @@ help() {
     echo "  cache     Cache latents and text encoder outputs"
     echo "  train     Train the LoRA"
     echo "  convert   Convert z-image LoRA for ComfyUI"
-    echo "            Usage: $0 convert [checkpoint] [--output path]"
+    echo "            Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
 }
 
 case "$1" in
@@ -473,7 +472,8 @@ case "$1" in
         fi
         ;;
     convert)
-        convert_lora "$2" "$3"
+        shift
+        convert_lora "$@"
         ;;
     *)
         help
