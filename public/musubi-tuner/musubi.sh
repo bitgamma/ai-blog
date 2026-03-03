@@ -399,9 +399,59 @@ train_lora() {
     log_info "Your LoRA checkpoints are in: ${OUTPUT_DIR}"
 }
 
+# Convert z-image LoRA for ComfyUI compatibility
+convert_lora() {
+    local INPUT_PATH="$1"
+    local OUTPUT_PATH="$2"
+    
+    # Auto-detect latest checkpoint if not provided
+    if [ -z "$INPUT_PATH" ]; then
+        INPUT_PATH=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "${PROJECT_NAME}*.safetensors" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
+        
+        if [ -z "$INPUT_PATH" ]; then
+            log_error "No LoRA checkpoint found in ${OUTPUT_DIR}"
+            log_info "Usage: $0 convert [checkpoint_path] [--output output_path]"
+            return 1
+        fi
+        
+        log_info "No checkpoint specified. Using latest: ${INPUT_PATH}"
+    fi
+    
+    # Validate input exists
+    if [ ! -f "$INPUT_PATH" ]; then
+        log_error "Checkpoint not found: $INPUT_PATH"
+        return 1
+    fi
+    
+    # Auto-generate output path if not provided
+    if [ -z "$OUTPUT_PATH" ]; then
+        local BASENAME=$(basename "$INPUT_PATH" .safetensors)
+        OUTPUT_PATH="${OUTPUT_DIR}/${BASENAME}_comfyui.safetensors"
+    fi
+    
+    log_info "Converting z-image LoRA for ComfyUI compatibility..."
+    log_info "Input:  ${INPUT_PATH}"
+    log_info "Output: ${OUTPUT_PATH}"
+    
+    python "convert_lora.py" \
+        --input "$INPUT_PATH" \
+        --output "$OUTPUT_PATH" \
+        --target "other"
+    
+    log_info "Conversion complete!"
+}
+
 # Help function
 help() {
-    echo "Usage: $0 {setup|create|cache|train}"
+    echo "Usage: $0 {setup|create|cache|train|convert}"
+    echo ""
+    echo "Actions:"
+    echo "  setup     Install musubi-tuner environment"
+    echo "  create    Create a new LoRA training project"
+    echo "  cache     Cache latents and text encoder outputs"
+    echo "  train     Train the LoRA"
+    echo "  convert   Convert z-image LoRA for ComfyUI"
+    echo "            Usage: $0 convert [checkpoint] [--output path]"
 }
 
 case "$1" in
@@ -417,6 +467,13 @@ case "$1" in
         ;;
     train)
         train_lora
+        # Automatically convert z-image LoRA for ComfyUI
+        if [ "$MODEL_VERSION" == "z-image" ] && [ -n "$CONVERSION_SCRIPT" ]; then
+            convert_lora
+        fi
+        ;;
+    convert)
+        convert_lora "$2" "$3"
         ;;
     *)
         help
