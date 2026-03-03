@@ -1,34 +1,33 @@
 ---
-title: 'Training Klein 9B/4B LoRAs with Musubi-Tuner on AMD Strix Halo'
-description: 'A comprehensive guide to train Flux.2 Klein 4B/9B LoRAs on AMD Strix Halo'
-pubDate: 'Feb 28 2026'
+title: 'Training Z-Image LoRAs with Musubi-Tuner on AMD Strix Halo'
+description: 'A comprehensive guide to train Z-Image LoRAs on AMD Strix Halo'
+pubDate: 'Mar 03 2026'
 ---
 import { Image } from "astro:assets";
 import ImageZoom from '../../components/ImageZoom.astro';
 import ComparisonSlider from '../../components/ComparisonSlider.astro';
-import loraTrainingEpoch00 from "../../assets/musubi-tuner/lora-training-epoch00.png";
-import loraTrainingEpoch06 from "../../assets/musubi-tuner/lora-training-epoch06.png";
-import loraTrainingEpoch12 from "../../assets/musubi-tuner/lora-training-epoch12.png";
-import loraTrainingEpoch20 from "../../assets/musubi-tuner/lora-training-epoch20.png";
-import loraTrainingEpoch30 from "../../assets/musubi-tuner/lora-training-epoch30.png";
-import portrait1Lora from "../../assets/musubi-tuner/portrait1-lora.png";
-import portrait1NoLora from "../../assets/musubi-tuner/portrait1-nolora.png";
-import portrait2Lora from "../../assets/musubi-tuner/portrait2-lora.png";
-import portrait2NoLora from "../../assets/musubi-tuner/portrait2-nolora.png";
-import portrait3Lora from "../../assets/musubi-tuner/portrait3-lora.png";
-import portrait3NoLora from "../../assets/musubi-tuner/portrait3-nolora.png";
-import portrait4Lora from "../../assets/musubi-tuner/portrait4-lora.png";
-import portrait4NoLora from "../../assets/musubi-tuner/portrait4-nolora.png";
-import portrait5Lora from "../../assets/musubi-tuner/portrait5-lora.png";
-import portrait5NoLora from "../../assets/musubi-tuner/portrait5-nolora.png";
+import portrait1Lora from "../../assets/z-image/portrait1-lora.png";
+import portrait1NoLora from "../../assets/z-image/portrait1-nolora.png";
+import portrait2Lora from "../../assets/z-image/portrait2-lora.png";
+import portrait2NoLora from "../../assets/z-image/portrait2-nolora.png";
+import portrait3Lora from "../../assets/z-image/portrait3-lora.png";
+import portrait3NoLora from "../../assets/z-image/portrait3-nolora.png";
+import portrait4Lora from "../../assets/z-image/portrait4-lora.png";
+import portrait4NoLora from "../../assets/z-image/portrait4-nolora.png";
+import portrait5Lora from "../../assets/z-image/portrait5-lora.png";
+import portrait5NoLora from "../../assets/z-image/portrait5-nolora.png";
 
-This guide walks you through setting up the tools and workflow for training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. It covers both Flux.2 Klein 4B and 9B models. For a similar guide on Z-Image training, see [Training Z-Image LoRAs](../z-image/). For other models, small adjustments will be needed and will be addressed in future guides.
+This guide walks you through setting up the tools and workflow for training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs with the Z-Image model. For a similar guide on Klein 9B/4B training, see [Training Klein 9B/4B LoRAs](../musubi-tuner/).
 
-**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a LoRA for Klein 9B and 4B based on my photographic style, with examples from my own training where applicable.
+**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a Z-Image LoRA based on my photographic style, with examples from my own training where applicable.
+
+> **Note:** There is a debate whether LoRAs trained with Z-Image work with Z-Image Turbo or not. My LoRA has been trained with Z-Image but works best with Z-Image Turbo. Definitely do some tests with both models.
 
 ## Hardware Requirements
 
 This guide assumes a Strix Halo with 128GB of RAM for the default path. Refer to the [Out of VRAM](#out-of-vram) section if you run into problems.
+
+> **Note:** In my personal experience, Z-Image required approximately 110GB of VRAM with the settings I used.
 
 ## Prerequisites
 
@@ -79,46 +78,43 @@ All overrides must be performed before running the `setup` step.
 
 ## Downloading Models
 
-We need to download the Flux 2 Klein 4B or 9B model and its VAE (Autoencoder). The Klein repo's VAE is not compatible with musubi-tuner, so we need the VAE from the main Flux 2 dev repository.
+We need to download the Z-Image model and its VAE (Autoencoder). The model can be found on HuggingFace.
 
-Note that we download the base model instead of the distilled 4-step model. This is intentional. The created LoRAs will work with the distilled model as well.
+### Z-Image Model
 
-### Klein 4B
+Download the following files from the Z-Image repository:
 
-1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B and download `flux-2-klein-base-4b.safetensors` + all `.safetensors` files from `text_encoder`
-2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev and download `ae.safetensors`
-3. Place all files in appropriate directories
+1. **Diffusion model** (BF16): [z_image_bf16.safetensors](https://huggingface.co/Comfy-Org/z_image/resolve/main/split_files/diffusion_models/z_image_bf16.safetensors)
 
-### Klein 9B
+2. **Text encoder** (Qwen 3 4B): [qwen_3_4b.safetensors](https://huggingface.co/Comfy-Org/z_image/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors)
 
-1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9B and download `flux-2-klein-base-9b.safetensors` + all `.safetensors` files from `text_encoder`
-2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev and download `ae.safetensors`
-3. Place all files in appropriate directories
+3. **VAE**: [ae.safetensors](https://huggingface.co/Comfy-Org/z_image/resolve/main/split_files/vae/ae.safetensors)
+
+Place all downloaded files in appropriate directories.
 
 After downloading, note the paths to your model files. You'll need them in the next steps.
 
-**Note**: If you already have a VAE and/or text encoder (either sharded or single file) that you are using with the distilled version of the model (for example in ComfyUI), you can use those files for the following steps instead of downloading them again.
+**Note**: If you already have a VAE and/or text encoder that you are using with other Flux-based models, you can use those files for the following steps instead of downloading them again.
 
 ## Project Creation
 
-We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and a standard musubi-tuner configuration for Klein 4B/9B
+We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and a standard musubi-tuner configuration for Z-Image.
 
 ```bash
-# Set the model version (e.g., klein-base-4b or klein-base-9b)
-export MODEL_VERSION="klein-base-4b"
+# Set the model version to z-image
+export MODEL_VERSION="z-image"
 
-# Set the path of the diffusion model (flux-2-klein-base-4b.safetensors or flux-2-klein-base-9b.safetensors)
-export DIT_MODEL="/path/to/dit/flux-2-klein-base-4b.safetensors"
+# Set the path of the diffusion model (Z-Image model file)
+export DIT_MODEL="/path/to/z_image_bf16.safetensors"
 
-# Set the path to the first shard of the text_encoder (e.g., model-00001-of-00002.safetensors or model-00001-of-00004.safetensors) 
-# or to the merged model file (e.g., qwen_3_4b.safetensors or qwen_3_8b.safetensors)
-export TEXT_ENCODER="/path/to/te/model-00001-of-00002.safetensors"
+# Set the path to the first shard of the text_encoder or to the merged model file
+export TEXT_ENCODER="/path/to/qwen_3_4b.safetensors"
 
 # Set the path to the VAE (e.g., ae.safetensors)
 export VAE_MODEL="/path/to/vae/ae.safetensors"
 
 # Set the project name. A folder with this name will be created
-export PROJECT_NAME="my-lora"
+export PROJECT_NAME="my-zimage-lora"
 
 # Create the project
 ./musubi.sh create
@@ -189,6 +185,8 @@ The following explains the most relevant parameters from the `training.toml` fil
 
 > **Important:** All the settings mentioned above are **starting defaults**. There is no one-size-fits-all configuration. You will need to experiment with these values to find what works best for your specific dataset and goals. The values provided are based on my experience, but your results may vary significantly.
 
+> **Personal Experience:** At least in comparison to Flux.2 Klein, it seems like Z-Image requires more epochs to learn.
+
 ## Running Training
 
 ```bash
@@ -228,16 +226,7 @@ During training, you'll see:
 | 10-20 | Check for overfitting (samples look too much like training images) |
 | 20+ | If loss is still decreasing, consider more epochs |
 
-Here are some examples from my training:
-
-| Epoch 0 | Epoch 6 | Epoch 12 | Epoch 20 | Epoch 30  |
-|-----------------|---------|----------|----------|------------------------|
-| <ImageZoom src={loraTrainingEpoch00} width={180} alt="Epoch 0 (Start) - Training loss and sample images at the beginning of training" /> | <ImageZoom src={loraTrainingEpoch06} width={180} alt="Epoch 6 - Early learning phase showing initial style emergence" /> | <ImageZoom src={loraTrainingEpoch12} width={180} alt="Epoch 12 - Mid-training with clearer style development" /> | <ImageZoom src={loraTrainingEpoch20} width={180} alt="Epoch 20 - Best checkpoint with optimal style quality" /> | <ImageZoom src={loraTrainingEpoch30} width={180} alt="Epoch 30 - Overtrained checkpoint with degraded quality" /> |
-| Start | Early learning | Mid-training | Best checkpoint | Overtrained |
-
-The last checkpoint is clearly overtrained and quality degraded significantly. I used checkpoint 20 instead.
-
-However, I still tested all most promising checkpoints with the distilled model using [ComfyUI](../comfyui/). That's the only way to be sure.
+However, it is a good idea to test the most promising checkpoints with Z-Image Turbo using [ComfyUI](../comfyui/). That's the only way to be sure.
 
 ## Using Your Trained LoRA
 
@@ -245,27 +234,41 @@ After training completes, you'll have checkpoint files in the `output` directory
 
 ```
 output/
-├── my-lora-000002.safetensors    # Epoch 2 checkpoint
-├── my-lora-000004.safetensors    # Epoch 4 checkpoint
-├── my-lora-000006.safetensors    # Epoch 6 checkpoint
+├── my-zimage-lora-000002.safetensors    # Epoch 2 checkpoint
+├── my-zimage-lora-000004.safetensors    # Epoch 4 checkpoint
+├── my-zimage-lora-000006.safetensors    # Epoch 6 checkpoint
 └── ...
 ```
+
 The final checkpoint won't have a sequence number.
 
 ### In ComfyUI
 
-1. Place the `.safetensors` file in your ComfyUI `models/loras/` directory
-2. Add a `Load LoRA` node to your workflow
-3. Connect it to your Flux model nodes
-4. Adjust the LoRA strength. Start with 1.0, but don't be afraid to push it significantly higher or lower.
+**Important:** Z-Image LoRAs require a conversion step for ComfyUI compatibility. This is done automatically for the last checkpoint after training, but you can also trigger it manually for other checkpoints.
+
+1. **Automatic conversion**: After training completes, the final checkpoint is automatically converted and saved as `my-zimage-lora_comfyui.safetensors`
+
+2. **Manual conversion**: For any other checkpoint, run:
+   ```bash
+   ./musubi.sh convert output/my-zimage-lora-000016.safetensors
+   ```
+   This creates `my-zimage-lora-000016_comfyui.safetensors`
+
+3. Place the `_comfyui.safetensors` file in your ComfyUI `models/loras/` directory
+
+4. Add a `Load LoRA` node to your workflow
+
+5. Connect it to your Z-Image Turbo model nodes
+
+6. Adjust the LoRA strength. Start with 1.0, but don't be afraid to push it significantly higher or lower.
 
 ### In other tools
 
-Most tools that support Stable Diffusion LoRAs will work with Flux LoRAs. Look for a "Load LoRA" or similar node/module.
+Most tools that support Stable Diffusion LoRAs will work with Flux LoRAs. Look for a "Load LoRA" or similar node/module. Note that you may need the converted `_comfyui.safetensors` files for compatibility.
 
 ### Results
 
-Here are some example images generated using my LoRA. They are generated with the same prompt and seed using Klein 4B.
+Here are some example images generated using my LoRA. They are generated with the same prompt and seed using Z-Image Turbo.
 
 <ComparisonSlider beforeImage={portrait1NoLora} afterImage={portrait1Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
 <ComparisonSlider beforeImage={portrait2NoLora} afterImage={portrait2Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
@@ -285,7 +288,7 @@ EMA works by applying a weighted average to checkpoint parameters, where a `beta
 
 **Usage:**
 ```bash
-./musubi.sh ema output/my-lora-000016.safetensors output/my-lora-000018.safetensors output/my-lora-000020.safetensors --output_file my-lora-ema.safetensors
+./musubi.sh ema output/my-zimage-lora-000016.safetensors output/my-zimage-lora-000018.safetensors output/my-zimage-lora-000020.safetensors --output_file my-zimage-lora-ema.safetensors
 ```
 
 You can also adjust the `beta` parameter (e.g., `--beta 0.97`) to give more or less weight to earlier checkpoints. Note that EMA works best when checkpoints are from similar training phases and show consistent improvement.
@@ -306,16 +309,17 @@ If you get "out of memory" errors:
 - Train for more epochs (style may need time to emerge)
 - Check your dataset quality (images should be clear, captions should be good)
 - Try a different `network_dim` (higher for complex styles)
+- Adjust the learning rate (try 5e-5 if loss is too high, 2e-4 if loss is too low)
 
 ## Conclusion
 
-You now have a complete workflow for setting up and training custom LoRAs with musubi-tuner on AMD GPUs. Start with a small dataset (50-100 images) and experiment with different settings to find what works best for your use case.
+You now have a complete workflow for setting up and training custom LoRAs with musubi-tuner on AMD GPUs for Z-Image. Start with a small dataset (50-100 images) and experiment with different settings to find what works best for your use case.
 
 For more information, check out:
 
 - [Musubi-Tuner GitHub](https://github.com/kohya-ss/musubi-tuner)
 - [LoRA Theory and Practice](https://arxiv.org/abs/2106.09685)
 - [My HuggingFace](https://huggingface.co/mikkoph)
-- [Training Z-Image LoRAs](../z-image/) - For a similar guide on Z-Image training
+- [Training Klein 9B/4B LoRAs](../musubi-tuner/) - For a similar guide on Klein training
 
 Happy training!
