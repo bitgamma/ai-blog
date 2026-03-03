@@ -5,6 +5,7 @@ pubDate: 'Feb 28 2026'
 ---
 import { Image } from "astro:assets";
 import ImageZoom from '../../components/ImageZoom.astro';
+import ComparisonSlider from '../../components/ComparisonSlider.astro';
 import loraTrainingEpoch00 from "../../assets/musubi-tuner/lora-training-epoch00.png";
 import loraTrainingEpoch06 from "../../assets/musubi-tuner/lora-training-epoch06.png";
 import loraTrainingEpoch12 from "../../assets/musubi-tuner/lora-training-epoch12.png";
@@ -263,13 +264,11 @@ Most tools that support Stable Diffusion LoRAs will work with Flux LoRAs. Look f
 
 Here are some examples images generated using my LoRA. They are generated with the same prompt and seed using Klein 4B. Left is with LoRA, right is without.
 
-| With LoRA | Without LoRA |
-|-----------|--------------|
-| <ImageZoom src={portrait1Lora} width={340} alt="Portrait 1 with LoRA"/> | <ImageZoom src={portrait1NoLora} width={340} alt="Portrait 1 without LoRA"/> |
-| <ImageZoom src={portrait2Lora} width={340} alt="Portrait 2 with LoRA" /> | <ImageZoom src={portrait2NoLora} width={340} alt="Portrait 2 without LoRA" /> |
-| <ImageZoom src={portrait3Lora} width={340} alt="Portrait 3 with LoRA" /> | <ImageZoom src={portrait3NoLora} width={340} alt="Portrait 3 without LoRA" /> |
-| <ImageZoom src={portrait4Lora} width={340} alt="Portrait 4 with LoRA" /> | <ImageZoom src={portrait4NoLora} width={340} alt="Portrait 4 without LoRA" /> |
-| <ImageZoom src={portrait5Lora} width={340} alt="Portrait 5 with LoRA" /> | <ImageZoom src={portrait5NoLora} width={340} alt="Portrait 5 without LoRA" /> |
+<ComparisonSlider beforeImage={portrait1NoLora} afterImage={portrait1Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait2NoLora} afterImage={portrait2Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait3NoLora} afterImage={portrait3Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait4NoLora} afterImage={portrait4Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait5NoLora} afterImage={portrait5Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
 
 ## Troubleshooting
 

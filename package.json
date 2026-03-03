@@ -13,8 +13,9 @@
     "@astrojs/rss": "^4.0.15",
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.17.1",
-    "sharp": "^0.34.3",
     "node-addon-api": "8.6.0",
-    "node-gyp": "12.2.0"
+    "node-gyp": "12.2.0",
+    "sharp": "^0.34.3",
+    "slick-image-compare-astro": "^0.0.4"
   }
 }

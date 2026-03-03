@@ -1,0 +1,16 @@
+---
+import ImageCompare from 'slick-image-compare-astro';
+const { beforeImage, afterImage, beforeLabel, afterLabel, width } = Astro.props;
+---
+
+<div style=`width: ${width}px; display: inline-block; padding: 15px 5px; box-sizing: border-box`>
+  <ImageCompare
+  beforeImage={beforeImage}
+  afterImage={afterImage}
+  beforeLabel={beforeLabel}
+  afterLabel={afterLabel}
+  animateIn={true}
+  startPos={50}
+  style="width: 100%"
+/>
+</div>
