@@ -401,6 +401,8 @@ train_lora() {
 
 # Convert z-image LoRA for ComfyUI compatibility
 convert_lora() {
+    init_env
+
     # Auto-detect latest checkpoint if no arguments provided
     if [ $# -eq 0 ]; then
         local INPUT_PATH=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "${PROJECT_NAME}*.safetensors" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
@@ -427,7 +429,7 @@ convert_lora() {
         local BASENAME=$(basename "$INPUT_PATH" .safetensors)
         local OUTPUT_PATH="${OUTPUT_DIR}/${BASENAME}_comfyui.safetensors"
         
-        log_info "Converting z-image LoRA for ComfyUI compatibility..."
+        log_info "Converting LoRA for ComfyUI compatibility..."
         log_info "Input:  ${INPUT_PATH}"
         log_info "Output: ${OUTPUT_PATH}"
         
@@ -440,9 +442,59 @@ convert_lora() {
     done
 }
 
+# EMA merge LoRA checkpoints
+ema() {
+    init_env
+
+    # Require at least one checkpoint path argument
+    if [ $# -eq 0 ]; then
+        log_error "No checkpoint paths specified."
+        log_info "Usage: $0 ema [checkpoint_path1] [checkpoint_path2] ... --output_file output.safetensors [options...]"
+        return 1
+    fi
+
+    # Check if --output_file is specified
+    local OUTPUT_FILE_SPECIFIED=false
+    for arg in "$@"; do
+        if [[ "$arg" == "--output_file" ]] || [[ "$arg" == --output_file=* ]]; then
+            OUTPUT_FILE_SPECIFIED=true
+            break
+        fi
+    done
+
+    # Check if --beta or --sigma_rel is specified
+    local BETA_SPECIFIED=false
+    for arg in "$@"; do
+        if [[ "$arg" == "--beta" ]] || [[ "$arg" == --beta=* ] || [ "$arg" == "--sigma_rel" ]] || [[ "$arg" == --sigma_rel=* ]]; then
+            BETA_SPECIFIED=true
+            break
+        fi
+    done
+
+    # Build the command
+    local COMMAND="python \"lora_post_hoc_ema.py\" \"$@\""
+
+    # Add --output_file if not specified
+    if [ "$OUTPUT_FILE_SPECIFIED" = false ]; then
+        COMMAND="$COMMAND --output_file \"${OUTPUT_DIR}/${PROJECT_NAME}_ema.safetensors\""
+    fi
+
+    # Add --beta 0.95 if not specified
+    if [ "$BETA_SPECIFIED" = false ]; then
+        COMMAND="$COMMAND --beta 0.95"
+    fi
+
+    log_info "Starting EMA merge..."
+
+    eval $COMMAND
+
+    log_info "EMA merge complete!"
+}
+
+
 # Help function
 help() {
-    echo "Usage: $0 {setup|create|cache|train|convert}"
+    echo "Usage: $0 {setup|create|cache|train|convert|ema}"
     echo ""
     echo "Actions:"
     echo "  setup     Install musubi-tuner environment"
@@ -451,6 +503,8 @@ help() {
     echo "  train     Train the LoRA"
     echo "  convert   Convert z-image LoRA for ComfyUI"
     echo "            Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
+    echo "  ema       Merge LoRA checkpoints using EMA"
+    echo "            Usage: $0 ema [checkpoint_path1] [checkpoint_path2] ... --output_file output.safetensors [options...]"
 }
 
 case "$1" in
@@ -474,6 +528,10 @@ case "$1" in
     convert)
         shift
         convert_lora "$@"
+        ;;
+    ema)
+        shift
+        ema "$@"
         ;;
     *)
         help
