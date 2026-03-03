@@ -22,7 +22,9 @@ import portrait4NoLora from "../../assets/musubi-tuner/portrait4-nolora.png";
 import portrait5Lora from "../../assets/musubi-tuner/portrait5-lora.png";
 import portrait5NoLora from "../../assets/musubi-tuner/portrait5-nolora.png";
 
-This guide walks you through training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. This guide is for both Flux.2 Klein 4B and 9B. For other models, small adjustments will be needed, and they will be addressed in future guides. These are the steps that I followed to train a LoRA for Klein 9B and 4B based on my photographic style. I will show some examples based on my own LoRA training where applicable.
+This guide walks you through setting up the tools and workflow for training a custom LoRA (Low-Rank Adaptation) using musubi-tuner on AMD Strix Halo APUs. It covers both Flux.2 Klein 4B and 9B models. For other models, small adjustments will be needed and will be addressed in future guides.
+
+**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a LoRA for Klein 9B and 4B based on my photographic style, with examples from my own training where applicable.
 
 ## Hardware Requirements
 
@@ -84,13 +86,13 @@ Note that we download the base model instead of the distilled 4-step model. This
 ### Klein 4B
 
 1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4B and download `flux-2-klein-base-4b.safetensors` + all `.safetensors` files from `text_encoder`
-2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev/tree/main and download `ae.safetensors`
+2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev and download `ae.safetensors`
 3. Place all files in appropriate directories
 
 ### Klein 9B
 
 1. Go to https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9B and download `flux-2-klein-base-9b.safetensors` + all `.safetensors` files from `text_encoder`
-2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev/tree/main and download `ae.safetensors`
+2. Go to https://huggingface.co/black-forest-labs/FLUX.2-dev and download `ae.safetensors`
 3. Place all files in appropriate directories
 
 After downloading, note the paths to your model files. You'll need them in the next steps.
@@ -108,7 +110,8 @@ export MODEL_VERSION="klein-base-4b"
 # Set the path of the diffusion model (flux-2-klein-base-4b.safetensors or flux-2-klein-base-9b.safetensors)
 export DIT_MODEL="/path/to/dit/flux-2-klein-base-4b.safetensors"
 
-# Set the path to the first shard of the text_encoder (e.g., model-00001-of-00002.safetensors or model-00001-of-00004.safetensors)
+# Set the path to the first shard of the text_encoder (e.g., model-00001-of-00002.safetensors or model-00001-of-00004.safetensors) 
+# or to the merged model file (e.g., qwen_3_4b.safetensors or qwen_3_8b.safetensors)
 export TEXT_ENCODER="/path/to/te/model-00001-of-00002.safetensors"
 
 # Set the path to the VAE (e.g., ae.safetensors)
@@ -123,7 +126,7 @@ export PROJECT_NAME="my-lora"
 
 ## Dataset Preparation
 
-A good dataset is crucial for training a useful LoRA. Here are some technical advice and rules of thumb. Be ready to experiment:
+A good dataset is crucial for training a useful LoRA. The following are technical guidelines and rules of thumb to get you started. However, **experimentation is key** - different datasets and styles may require different approaches.
 
 ### Adding Images
 
@@ -176,7 +179,7 @@ Each line is a separate prompt that will be sampled during training. Adding as m
 
 ## Training Configuration
 
-Finally, let's explain some of the most relevant parameters from the `training.toml` in the project directory:
+The following explains the most relevant parameters from the `training.toml` file in your project directory:
 
 - `network_dim`: Dimension of the LoRA (8-16 is usually suitable for simple styles, 32-64 for more complex concepts or characters)
 - `learning_rate`: 1e-4 is a good starting point (adjust if the loss doesn't decrease)
@@ -184,7 +187,7 @@ Finally, let's explain some of the most relevant parameters from the `training.t
 - `save_every_n_epochs`: How often to save checkpoints
 - `save_state`: Saves the training state with each checkpoint. This allows stopping and resuming training. It consumes more disk space and VRAM
 
-Feel free to play with all parameters in the file. There is no correct recipe, unfortunately, and experimentation is essential.
+> **Important:** All the settings mentioned above are **starting defaults**. There is no one-size-fits-all configuration. You will need to experiment with these values to find what works best for your specific dataset and goals. The values provided are based on my experience, but your results may vary significantly.
 
 ## Running Training
 
@@ -289,7 +292,7 @@ If you get "out of memory" errors:
 
 ## Conclusion
 
-You now have a complete workflow for training custom LoRAs with musubi-tuner on AMD GPUs. Start with a small dataset (50-100 images) and experiment with different settings to find what works best for your style.
+You now have a complete workflow for setting up and training custom LoRAs with musubi-tuner on AMD GPUs. Start with a small dataset (50-100 images) and experiment with different settings to find what works best for your use case.
 
 For more information, check out:
 
