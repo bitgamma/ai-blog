@@ -194,4 +194,43 @@ sudo tuned-adm profile accelerator-performance
 
 ### ComfyUI
 
+#### PyTorch compile
+
 We can achieve some non-negligible performance gains by enabling `torch.compile` for models. You can download my workflows for [Flux 2 Klein](../../public/comfyui/Flux2-Klein.json) (works with 9b and 4b), [Z-Image](../../public/comfyui/Z-Image.json) (works with Turbo and Base), and [Anima](../../public/comfyui/Anima.json) if you want a quick way to set this up. You will need to download some custom nodes, but ComfyUI Manager should make this very easy.
+
+#### Sage Attention
+
+Sage Attention can give modest performance increases. I didn't find this increase enough to justify potential conflicts so I am not using it. To install Sage Attention, do the following:
+
+```bash
+sudo -u comfyui bash
+cd
+uv pip install sageattention==1.0.6
+cd .venv/lib/python3.13/site-packages/sageattention/
+curl -O https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/472aabd81bc64913ed1076320f9f3dc00abfb9dd/comfy/customzluda/sa/attn_qk_int8_per_block.py
+curl -O https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/472aabd81bc64913ed1076320f9f3dc00abfb9dd/comfy/customzluda/sa/attn_qk_int8_per_block_causal.py
+curl -O https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/472aabd81bc64913ed1076320f9f3dc00abfb9dd/comfy/customzluda/sa/quant_per_block.py
+exit
+```
+
+To use it, in your systemd unit file replace `--use-pytorch-cross-attention` with `--use-sage-attention`.
+
+#### Flash Attention
+
+Flash Attention reduces VRAM usage, but doesn't play well with model compilation in some cases. I'd only recommend it if you are short on VRAM. To install Flash Attention (Triton), do the following:
+
+```bash
+sudo -u comfyui bash
+cd
+source .venv/bin/activate
+export FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
+uv pip install ninja
+git clone https://github.com/Dao-AILab/flash-attention.git
+cd flash-attention/
+python setup.py install
+cd ..
+rm -rf flash-attention
+exit
+```
+
+To use it, in your systemd unit file replace `--use-pytorch-cross-attention` with `--use-flash-attention`.
