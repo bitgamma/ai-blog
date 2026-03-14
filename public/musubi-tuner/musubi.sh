@@ -80,7 +80,7 @@ init_env() {
             NETWORK_NAME="networks.lora_flux_2"
             TIMESTEP_SAMPLING="flux2_shift"
             EXTRA_TRAINING_CONFIG="model_version = \"${MODEL_VERSION}\""
-            EXTRA_CACHING_ARGS="--model_version \"${MODEL_VERSION}\""
+            EXTRA_CACHING_ARGS="--model_version ${MODEL_VERSION}"
             ;;
         z-image)
             TRAINING_SCRIPT="zimage_train_network.py"
