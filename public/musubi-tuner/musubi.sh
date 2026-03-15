@@ -465,14 +465,14 @@ ema() {
     # Check if --beta or --sigma_rel is specified
     local BETA_SPECIFIED=false
     for arg in "$@"; do
-        if [[ "$arg" == "--beta" ]] || [[ "$arg" == --beta=* ] || [ "$arg" == "--sigma_rel" ]] || [[ "$arg" == --sigma_rel=* ]]; then
+        if [[ "$arg" == "--beta" ]] || [[ "$arg" == --beta=* ]] || [[ "$arg" == "--sigma_rel" ]] || [[ "$arg" == --sigma_rel=* ]]; then
             BETA_SPECIFIED=true
             break
         fi
     done
 
     # Build the command
-    local COMMAND="python \"lora_post_hoc_ema.py\" \"$@\""
+    local COMMAND="python \"lora_post_hoc_ema.py\" $@"
 
     # Add --output_file if not specified
     if [ "$OUTPUT_FILE_SPECIFIED" = false ]; then
