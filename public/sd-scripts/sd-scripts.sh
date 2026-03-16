@@ -392,65 +392,14 @@ train_lora() {
     log_info "Your LoRA checkpoints are in: ${OUTPUT_DIR}"
 }
 
-# Merge LoRA checkpoints using EMA
-merge() {
-    init_env
-
-    # Require at least one checkpoint path argument
-    if [ $# -eq 0 ]; then
-        log_error "No checkpoint paths specified."
-        log_info "Usage: $0 merge [checkpoint_path1] [checkpoint_path2] ... --output_file output.safetensors [options...]"
-        return 1
-    fi
-
-    # Check if --output_file is specified
-    local OUTPUT_FILE_SPECIFIED=false
-    for arg in "$@"; do
-        if [[ "$arg" == "--output_file" ]] || [[ "$arg" == --output_file=* ]]; then
-            OUTPUT_FILE_SPECIFIED=true
-            break
-        fi
-    done
-
-    # Check if --beta is specified
-    local BETA_SPECIFIED=false
-    for arg in "$@"; do
-        if [[ "$arg" == "--beta" ]] || [[ "$arg" == --beta=* ]]; then
-            BETA_SPECIFIED=true
-            break
-        fi
-    done
-
-    # Build the command
-    local COMMAND="python \"${SD_SCRIPTS_INSTALL_DIR}/sd-scripts/merge_lora.py\" $@"
-
-    # Add --output_file if not specified
-    if [ "$OUTPUT_FILE_SPECIFIED" = false ]; then
-        COMMAND="$COMMAND --output_file \"${OUTPUT_DIR}/${PROJECT_NAME}_merged.safetensors\""
-    fi
-
-    # Add --beta 0.95 if not specified
-    if [ "$BETA_SPECIFIED" = false ]; then
-        COMMAND="$COMMAND --beta 0.95"
-    fi
-
-    log_info "Starting LoRA merge..."
-
-    eval $COMMAND
-
-    log_info "LoRA merge complete!"
-}
-
 # Help function
 help() {
-    echo "Usage: $0 {setup|create|train|merge}"
+    echo "Usage: $0 {setup|create|train}"
     echo ""
     echo "Actions:"
     echo "  setup    Install sd-scripts environment"
     echo "  create   Create a new LoRA training project"
     echo "  train    Train the LoRA"
-    echo "  merge    Merge LoRA checkpoints"
-    echo "           Usage: $0 merge [checkpoint_path1] [checkpoint_path2] ... --output_file output.safetensors [options...]"
 }
 
 case "$1" in
@@ -462,10 +411,6 @@ case "$1" in
         ;;
     train)
         train_lora
-        ;;
-    merge)
-        shift
-        merge "$@"
         ;;
     *)
         help
