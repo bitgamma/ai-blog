@@ -197,7 +197,7 @@ The following explains the most relevant parameters from the `training.toml` fil
 ./musubi.sh train
 ```
 
-**Note:** You are likely to see many warnings when running this command. They are harmless and can be ignored.
+**Note:** You are likely to see many warnings when running this command. They are harmless and can be ignored. Model compilation might even fail the first time, rerunning the `train` command will fix it.
 
 ## Resuming Training
 
@@ -221,12 +221,14 @@ During training, you'll see:
 
 | Epoch | What to Check |
 |-------|---------------|
-| 1-5 | Loss should start decreasing |
-| 5-10 | Sample images should show the style emerging |
-| 10-20 | Check for overfitting (samples look too much like training images) |
-| 20+ | If loss is still decreasing, consider more epochs |
+| 1-10 | Loss should start decreasing |
+| 10-30 | Sample images should show the style emerging |
+| 30-100 | Check for overfitting (samples look too much like training images) |
+| 100+ | If loss is still decreasing, consider more epochs |
 
 However, it is a good idea to test the most promising checkpoints with Z-Image Turbo using [ComfyUI](../comfyui/). That's the only way to be sure.
+
+> ***Note:*** Do not give up too early! Z-Image LoRA can require a lot of epochs before you reach the desired effect.
 
 ## Using Your Trained LoRA
 
