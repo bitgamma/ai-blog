@@ -76,12 +76,12 @@ init_env() {
         sdxl) 
             TRAINING_SCRIPT="sdxl_train_network.py"
             NETWORK_MODULE="networks.lora"
-            EXTRA_TRAINING_CONFIG="--cache_latents --cache_text_encoder_outputs"
+            EXTRA_TRAINING_CONFIG="--cache_latents"
             ;;
         anima)
             TRAINING_SCRIPT="anima_train_network.py"
             NETWORK_MODULE="networks.lora_anima"
-            EXTRA_TRAINING_CONFIG="--cache_latents --cache_text_encoder_outputs"
+            EXTRA_TRAINING_CONFIG="--cache_latents"
             ;;
         *)
             log_error "MODEL_VERSION must be 'sdxl' or 'anima'."
@@ -390,16 +390,64 @@ train_lora() {
     
     log_info "Training completed!"
     log_info "Your LoRA checkpoints are in: ${OUTPUT_DIR}"
+    
+    # Automatically convert anima LoRA for ComfyUI
+    if [ "$MODEL_VERSION" == "anima" ]; then
+        convert_lora
+    fi
+}
+
+# Convert anima LoRA for ComfyUI compatibility
+convert_lora() {
+    init_env
+
+    # Auto-detect latest checkpoint if no arguments provided
+    if [ $# -eq 0 ]; then
+        local INPUT_PATH=$(find "${OUTPUT_DIR}" -maxdepth 1 -type f -name "${PROJECT_NAME}*.safetensors" -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)
+        
+        if [ -z "$INPUT_PATH" ]; then
+            log_error "No LoRA checkpoint found in ${OUTPUT_DIR}"
+            log_info "Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
+            return 1
+        fi
+        
+        log_info "No checkpoint specified. Using latest: ${INPUT_PATH}"
+        set -- "$INPUT_PATH"
+    fi
+    
+    # Process all provided input paths
+    for INPUT_PATH in "$@"; do
+        # Validate input exists
+        if [ ! -f "$INPUT_PATH" ]; then
+            log_error "Checkpoint not found: $INPUT_PATH"
+            continue
+        fi
+        
+        # Auto-generate output path
+        local BASENAME=$(basename "$INPUT_PATH" .safetensors)
+        local OUTPUT_PATH="${OUTPUT_DIR}/${BASENAME}_comfyui.safetensors"
+        
+        log_info "Converting LoRA for ComfyUI compatibility..."
+        log_info "Input:  ${INPUT_PATH}"
+        log_info "Output: ${OUTPUT_PATH}"
+        
+        python "${SD_SCRIPTS_INSTALL_DIR}/sd-scripts/networks/convert_anima_lora_to_comfy.py" \
+            "$INPUT_PATH" "$OUTPUT_PATH"
+        
+        log_info "Conversion complete!"
+    done
 }
 
 # Help function
 help() {
-    echo "Usage: $0 {setup|create|train}"
+    echo "Usage: $0 {setup|create|train|convert}"
     echo ""
     echo "Actions:"
     echo "  setup    Install sd-scripts environment"
     echo "  create   Create a new LoRA training project"
     echo "  train    Train the LoRA"
+    echo "  convert  Convert anima LoRA for ComfyUI"
+    echo "           Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
 }
 
 case "$1" in
@@ -411,6 +459,10 @@ case "$1" in
         ;;
     train)
         train_lora
+        ;;
+    convert)
+        shift
+        convert_lora "$@"
         ;;
     *)
         help
