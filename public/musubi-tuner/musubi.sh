@@ -100,11 +100,9 @@ init_env() {
     export TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL=1
     export TORCH_BLAS_PREFER_HIPBLASLT=1
 
-    cd "$MUSUBI_TUNER_INSTALL_DIR/musubi-tuner"
-
     # Ensure virtual environment is active
     if [ -z "$VIRTUAL_ENV" ]; then
-        source .venv/bin/activate
+        source "${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner/.venv/bin/activate"
     fi
 }
 
@@ -343,7 +341,7 @@ cache_latents() {
     
     log_info "Caching latents..."
     
-    python "${CACHE_LATENT_SCRIPT}" \
+    python "${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner/${CACHE_LATENT_SCRIPT}" \
         --dataset_config "${PROJECT_DIR}/dataset.toml" \
         --vae "${VAE_MODEL}" \
         --disable_cudnn_backend \
@@ -359,7 +357,7 @@ cache_text_encoders() {
     
     log_info "Caching text encoder outputs..."
     
-    python "${CACHE_TEXT_ENCODER_SCRIPT}" \
+    python "${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner/${CACHE_TEXT_ENCODER_SCRIPT}" \
         --dataset_config "${PROJECT_DIR}/dataset.toml" \
         --text_encoder "${TEXT_ENCODER}" \
         --batch_size 16 \
@@ -373,6 +371,8 @@ train_lora() {
     log_info "Initializing environment..."
     init_env
     
+    cd ${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner
+
     # Check for existing checkpoints to resume from
     RESUME_PATH=""
     if [ -d "$OUTPUT_DIR" ]; then
@@ -433,7 +433,7 @@ convert_lora() {
         log_info "Input:  ${INPUT_PATH}"
         log_info "Output: ${OUTPUT_PATH}"
         
-        python "convert_lora.py" \
+        python "${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner/convert_lora.py" \
             --input "$INPUT_PATH" \
             --output "$OUTPUT_PATH" \
             --target "other"
@@ -472,7 +472,7 @@ ema() {
     done
 
     # Build the command
-    local COMMAND="python \"lora_post_hoc_ema.py\" $@"
+    local COMMAND="python \"${MUSUBI_TUNER_INSTALL_DIR}/musubi-tuner/lora_post_hoc_ema.py\" $@"
 
     # Add --output_file if not specified
     if [ "$OUTPUT_FILE_SPECIFIED" = false ]; then
