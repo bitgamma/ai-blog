@@ -1,0 +1,314 @@
+---
+title: 'Training Anima LoRAs with sd-scripts on AMD Strix Halo'
+description: 'A comprehensive guide to train Anima LoRAs using sd-scripts on AMD Strix Halo'
+pubDate: 'Mar 16 2026'
+---
+import { Image } from "astro:assets";
+import ImageZoom from '../../components/ImageZoom.astro';
+import ComparisonSlider from '../../components/ComparisonSlider.astro';
+import loraTrainingEpoch00 from '../../assets/sd-scripts/lora-training-epoch00.png';
+import loraTrainingEpoch06 from '../../assets/sd-scripts/lora-training-epoch06.png';
+import loraTrainingEpoch12 from '../../assets/sd-scripts/lora-training-epoch12.png';
+import loraTrainingEpoch20 from '../../assets/sd-scripts/lora-training-epoch20.png';
+import loraTrainingEpoch30 from '../../assets/sd-scripts/lora-training-epoch30.png';
+import portrait1Lora from '../../assets/sd-scripts/portrait1-lora.png';
+import portrait1NoLora from '../../assets/sd-scripts/portrait1-nolora.png';
+import portrait2Lora from '../../assets/sd-scripts/portrait2-lora.png';
+import portrait2NoLora from '../../assets/sd-scripts/portrait2-nolora.png';
+import portrait3Lora from '../../assets/sd-scripts/portrait3-lora.png';
+import portrait3NoLora from '../../assets/sd-scripts/portrait3-nolora.png';
+import portrait4Lora from '../../assets/sd-scripts/portrait4-lora.png';
+import portrait4NoLora from '../../assets/sd-scripts/portrait4-nolora.png';
+import portrait5Lora from '../../assets/sd-scripts/portrait5-lora.png';
+import portrait5NoLora from '../../assets/sd-scripts/portrait5-nolora.png';
+
+This guide walks you through setting up the tools and workflow for training a custom LoRA (Low-Rank Adaptation) using sd-scripts on AMD Strix Halo APUs. It focuses on training Anima models. For a similar guide on musubi-tuner, see [Training Klein 9B/4B LoRAs with Musubi-Tuner](../musubi-tuner/) or [Training Z-Image LoRAs](../z-image/).
+
+**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a LoRA for Anima based on my photographic style, with examples from my own training where applicable.
+
+## Hardware Requirements
+
+This guide assumes a Strix Halo with 128GB of RAM for the default path. Refer to the [Out of VRAM](#out-of-vram) section if you run into problems.
+
+## Prerequisites
+
+Make sure you have the following installed:
+
+- **uv** - A fast Python package installer and manager
+- **git** - Version control system
+
+You can install `uv` and `git` on most Linux distributions:
+
+```bash
+# Arch Linux
+sudo pacman -S uv git
+
+# Ubuntu/Debian
+sudo apt install uv git
+```
+
+## Installation
+
+Download the [sd-scripts wrapper script](https://raw.githubusercontent.com/bitgamma/ai-blog/refs/heads/master/public/sd-scripts/sd-scripts.sh) and copy it where you want. This is a small script I created to simplify the procedure. The script is easy to read, so if you are curious, have a look at what it does!
+
+Now `cd` to the directory where the script is located. From there, you will need to:
+
+```bash
+# Make the script executable
+chmod +x sd-scripts.sh
+
+# Install sd-scripts
+./sd-scripts.sh setup
+```
+
+By default this will install sd-scripts in your home directory. You can override the install directory:
+
+```bash
+export SD_SCRIPTS_INSTALL_DIR="/sd-scripts/installation/path"
+```
+
+The script defaults to downloading dependencies for Strix Halo (gfx1151). This can also be overridden:
+
+```bash
+# You can check all available architectures here: https://rocm.nightlies.amd.com/v2-staging/
+# The example below is for Strix Point
+export GFX_NAME="gfx1150"
+```
+
+All overrides must be performed before running the `setup` step.
+
+## Downloading Models
+
+We need to download the Anima base model and its components. Anima uses a different architecture than Flux, requiring specific model files.
+
+All Anima model files are available [in the official HuggingFace repository of the model](https://huggingface.co/circlestone-labs/Anima/tree/main/split_files)
+
+### Anima Model Components
+
+1. **DIT Model**: Download [`diffusion_models/anima-preview2.safetensors`](https://huggingface.co/circlestone-labs/Anima/blob/main/split_files/diffusion_models/anima-preview2.safetensors)
+2. **VAE**: Download [`vae/qwen_image_vae.safetensors`](https://huggingface.co/circlestone-labs/Anima/blob/main/split_files/vae/qwen_image_vae.safetensors)
+3. **Qwen3 Model**: Download [`text_encoders/qwen_3_06b_base.safetensors`](https://huggingface.co/circlestone-labs/Anima/blob/main/split_files/text_encoders/qwen_3_06b_base.safetensors)
+
+**Note**: The exact model files and their locations may vary. Check the official Anima repository on HuggingFace for the latest model releases.
+
+After downloading, note the paths to your model files. You'll need them in the next steps.
+
+## Project Creation
+
+We will now create the LoRA project. Once again, we will rely on the script to create the initial directory structure and standard sd-scripts configuration for Anima.
+
+```bash
+# Set the model version to "anima"
+export MODEL_VERSION="anima"
+
+# Set the path to the DIT model (Anima diffusion transformer preview-2)
+export DIT_MODEL="/path/to/diffusion_models/anima-preview2.safetensors"
+
+# Set the path to the VAE (Qwen VAE)
+export VAE_MODEL="/path/to/vae/qwen_image_vae.safetensors"
+
+# Set the path to the Qwen3 model
+export QWEN3_MODEL="/path/to/text_encoders/qwen_3_06b_base.safetensors"
+
+# Set the path to the T5-XXL tokenizer (optional, needed only if you want to use a custom tokenizer)
+export T5XXL_TOKENIZER="/path/to/t5xxl/tokenizer"
+
+# Set the project name. A folder with this name will be created
+export PROJECT_NAME="my-anima-lora"
+
+# Create the project
+./sd-scripts.sh create
+```
+
+## Dataset Preparation
+
+A good dataset is crucial for training a useful LoRA. The following are technical guidelines and rules of thumb to get you started. However, **experimentation is key** - different datasets and styles may require different approaches.
+
+### Adding Images
+
+Place your training images in the `dataset` directory of your project. Each image should have:
+
+- **File format:** PNG, JPG, or WEBP
+- **Resolution:** Aim for 1024x1024. Using a single resolution for all images can reduce the number of batches, which is good
+- **Aspect ratio:** Square images work best but other ratios will work too
+
+As a rule of thumb, anywhere from 20-200 images will work. The quality of the images is more important than the number.
+
+### Adding Captions
+
+For each image, create a corresponding text file with the same name but `.txt` extension:
+
+```
+dataset/
+├── image1.jpg
+├── image1.txt          # Caption for image1.jpg
+├── image2.png
+├── image2.txt          # Caption for image2.png
+└── ...
+```
+
+**Caption rules of thumb:**
+
+- For styles: describing the scene but not the style works. I had good results with just empty captions.
+- For characters: a trigger word + a short description seems to work well.
+
+### Editing the Dataset Config
+
+In the project directory, you will find a `dataset.toml` file. While usable as-is, here is the explanation of some of its parameters:
+
+- `resolution`: Target resolution for training
+- `batch_size`: How many images to process at once (reduce if you run out of VRAM)
+- `enable_bucket`: Allows different aspect ratios (keeps more detail)
+- `num_repeats`: How many times to cycle through the dataset per epoch (higher = more training)
+
+## Creating Reference Prompts
+
+Another notable file is called `reference_prompts.txt`. Reference prompts are used to generate sample images during training, so you can see how the LoRA is progressing.
+
+Example with a single prompt:
+
+```
+A close-up portrait by mikkoph of a very young woman with fair skin and striking blue eyes, looking directly at the camera with a soft, serene expression. Her blonde hair is styled in an elegant updo, adorned with numerous small white flowers, possibly daisies, nestled throughout the curls. She wears a floral-patterned blouse with black, white, and gold flowers, a pearl earring in her right ear, and has a manicure with white nail polish. Her hands are gently cupped around her face, with her fingers lightly touching her cheeks. The background is a deep, dark blue, creating a dramatic contrast that highlights her features and the delicate details of her look. --w 1024 --h 1024 --d 42 --s 30
+```
+
+Each line is a separate prompt that will be sampled during training. Adding as many as you need, but keep in mind that this will make the training session longer.
+
+## Training Configuration
+
+The following explains the most relevant parameters from the `training.toml` file in your project directory:
+
+- `network_dim`: Dimension of the LoRA (8-16 is usually suitable for simple styles, 32-64 for more complex concepts or characters)
+- `network_alpha`: Alpha value, typically half of network_dim
+- `learning_rate`: 1e-4 is a good starting point (adjust if the loss doesn't decrease)
+- `max_train_epochs`: How many training cycles (10-50, depending on dataset size)
+- `save_every_n_epochs`: How often to save checkpoints
+- `save_state`: Saves the training state with each checkpoint. This allows stopping and resuming training. It consumes more disk space and VRAM
+- `compile`: Enable torch.compile for faster training (default: true)
+- `sdpa`: Use scaled dot product attention for better performance (default: true)
+
+> **Important:** All the settings mentioned above are **starting defaults**. There is no one-size-fits-all configuration. You will need to experiment with these values to find what works best for your specific dataset and goals. The values provided are based on my experience, but your results may vary significantly.
+
+## Running Training
+
+```bash
+# Run the training
+./sd-scripts.sh train
+```
+
+**Note:** You are likely to see many warnings when running this command. They are harmless and can be ignored.
+
+## Resuming Training
+
+If you have stopped the training or feel that the LoRA is undertrained even after finishing, you can resume training if you set `save_state` to true (which is the default) in `training.toml`. To resume, only run:
+
+```bash
+./sd-scripts.sh train
+```
+
+This will automatically find the latest saved state and restart training from there.
+
+## Monitoring Training
+
+During training, you'll see:
+
+1. **Loss values** - Should decrease over time. If it stays flat or increases, your learning rate may be too high. However, do not rely too much on this value.
+2. **Sample images** - Generated every N epochs (or whatever you set) showing how the LoRA is learning
+3. **Checkpoint files** - Saved to the `output` directory of the project every N epochs (or whatever you set)
+
+### What to Look For
+
+| Epoch | What to Check |
+|-------|---------------|
+| 1-5 | Loss should start decreasing |
+| 5-10 | Sample images should show the style emerging |
+| 10-20 | Check for overfitting (samples look too much like training images) |
+| 20+ | If loss is still decreasing, consider more epochs |
+
+Here are some examples from my training:
+
+| Epoch 0 | Epoch 6 | Epoch 12 | Epoch 20 | Epoch 30  |
+|-----------------|---------|----------|----------|------------------------|
+| <ImageZoom src={loraTrainingEpoch00} width={180} alt="Epoch 0 (Start) - Training loss and sample images at the beginning of training" /> | <ImageZoom src={loraTrainingEpoch06} width={180} alt="Epoch 6 - Early learning phase showing initial style emergence" /> | <ImageZoom src={loraTrainingEpoch12} width={180} alt="Epoch 12 - Mid-training with clearer style development" /> | <ImageZoom src={loraTrainingEpoch20} width={180} alt="Epoch 20 - Best checkpoint with optimal style quality" /> | <ImageZoom src={loraTrainingEpoch30} width={180} alt="Epoch 30 - Overtrained checkpoint with degraded quality" /> |
+| Start | Early learning | Mid-training | Almost there | Final |
+
+I tested all most promising checkpoints using [ComfyUI](../comfyui/) and went for the last one.
+
+## Using Your Trained LoRA
+
+After training completes, you'll have checkpoint files in the `output` directory of your project:
+
+```
+output/
+├── my-anima-lora-000002.safetensors    # Epoch 2 checkpoint
+├── my-anima-lora-000004.safetensors    # Epoch 4 checkpoint
+├── my-anima-lora-000006.safetensors    # Epoch 6 checkpoint
+└── ...
+```
+
+The final checkpoint won't have a sequence number.
+
+### In ComfyUI
+
+**Important:** Anima LoRAs require a conversion step for ComfyUI compatibility. This is done automatically for the last checkpoint after training, but you can also trigger it manually for other checkpoints.
+
+1. **Automatic conversion**: After training completes, the final checkpoint is automatically converted and saved as `my-anima-lora_comfyui.safetensors`
+
+2. **Manual conversion**: For any other checkpoint, run:
+   ```bash
+   ./sd-scripts.sh convert output/my-anima-lora-000016.safetensors
+   ```
+   This creates `my-anima-lora-000016_comfyui.safetensors`
+
+3. Place the `_comfyui.safetensors` file in your ComfyUI `models/loras/` directory
+
+4. Add a `Load LoRA` node to your workflow
+
+5. Connect it to your Anima model nodes
+
+6. Adjust the LoRA strength. Start with 1.0, but don't be afraid to push it significantly higher or lower.
+
+### In other tools
+
+Most tools that support Stable Diffusion LoRAs will work with Anima LoRAs. Look for a "Load LoRA" or similar node/module.
+
+### Results
+
+Here are some example images generated using my LoRA. They are generated with the same prompt and seed using Anima.
+
+<ComparisonSlider beforeImage={portrait1NoLora} afterImage={portrait1Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait2NoLora} afterImage={portrait2Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait3NoLora} afterImage={portrait3Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait4NoLora} afterImage={portrait4Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+<ComparisonSlider beforeImage={portrait5NoLora} afterImage={portrait5Lora} beforeLabel='No Lora' afterLabel='With Lora' width={400}/>
+
+## Troubleshooting
+
+### Out of VRAM
+
+If you get "out of memory" errors:
+
+- Reduce `batch_size` in `dataset.toml`
+- Try `optimizer_type = "AdamW"` in `training.toml` (or use 8-bit optimizers if available)
+- Reduce `resolution` (try 768x768)
+- Reduce `max_data_loader_n_workers` (try 1)
+- Disable `compile` in `training.toml` if it's causing issues
+
+### Samples Look Bad
+
+- Train for more epochs (style may need time to emerge)
+- Check your dataset quality (images should be clear, captions should be good)
+- Try a different `network_dim` (higher for complex styles)
+- Adjust `learning_rate` if the loss is not decreasing properly
+
+## Conclusion
+
+You now have a complete workflow for setting up and training custom LoRAs with sd-scripts on AMD GPUs. Start with a small dataset (50-100 images) and experiment with different settings to find what works best for your use case.
+
+For more information, check out:
+
+- [sd-scripts GitHub](https://github.com/kohya-ss/sd-scripts)
+- [LoRA Theory and Practice](https://arxiv.org/abs/2106.09685)
+- [My HuggingFace](https://huggingface.co/mikkoph)
+- [Training Klein 9B/4B LoRAs with Musubi-Tuner](../musubi-tuner/) - For a similar guide on Flux training
+- [Training Z-Image LoRAs](../z-image/) - For a similar guide on Z-Image training
+
