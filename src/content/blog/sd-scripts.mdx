@@ -24,7 +24,7 @@ import portrait5NoLora from '../../assets/sd-scripts/portrait5-nolora.png';
 
 This guide walks you through setting up the tools and workflow for training a custom LoRA (Low-Rank Adaptation) using sd-scripts on AMD Strix Halo APUs. It focuses on training Anima models. For a similar guide on musubi-tuner, see [Training Klein 9B/4B LoRAs with Musubi-Tuner](../musubi-tuner/) or [Training Z-Image LoRAs](../z-image/).
 
-**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a LoRA for Anima based on my photographic style, with examples from my own training where applicable.
+**The goal of this guide is to help you set up the tools and environment for LoRA training.** The actual training process requires experimentation to find settings that work best for your specific use case. These are the steps I followed to train a LoRA for Anima based on a specific anime style, with examples from my own training where applicable.
 
 ## Hardware Requirements
 
@@ -168,7 +168,7 @@ Another notable file is called `reference_prompts.txt`. Reference prompts are us
 Example with a single prompt:
 
 ```
-A close-up portrait by mikkoph of a very young woman with fair skin and striking blue eyes, looking directly at the camera with a soft, serene expression. Her blonde hair is styled in an elegant updo, adorned with numerous small white flowers, possibly daisies, nestled throughout the curls. She wears a floral-patterned blouse with black, white, and gold flowers, a pearl earring in her right ear, and has a manicure with white nail polish. Her hands are gently cupped around her face, with her fingers lightly touching her cheeks. The background is a deep, dark blue, creating a dramatic contrast that highlights her features and the delicate details of her look. --w 1024 --h 1024 --d 42 --s 30
+An illustration in @mikkoani style of a very young woman with fair skin and striking blue eyes, looking directly at the camera with a soft, serene expression. Her blonde hair is styled in an elegant updo, adorned with numerous small white flowers, possibly daisies, nestled throughout the curls. She wears a floral-patterned blouse with black, white, and gold flowers, a pearl earring in her right ear, and has a manicure with white nail polish. Her hands are gently cupped around her face, with her fingers lightly touching her cheeks. The background is a deep, dark blue, creating a dramatic contrast that highlights her features and the delicate details of her look. --w 1024 --h 1024 --d 42 --s 30
 ```
 
 Each line is a separate prompt that will be sampled during training. Adding as many as you need, but keep in mind that this will make the training session longer.
