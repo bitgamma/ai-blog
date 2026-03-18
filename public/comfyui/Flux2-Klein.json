@@ -1,65 +1,9 @@
 {
   "id": "92112d97-bb64-4b44-86f2-ea5691ef8f6e",
   "revision": 0,
-  "last_node_id": 155,
-  "last_link_id": 321,
+  "last_node_id": 175,
+  "last_link_id": 337,
   "nodes": [
-    {
-      "id": 142,
-      "type": "f2a4744d-e70e-4aac-ba41-f86eeafb1438",
-      "pos": [
-        -1036.5319788207876,
-        1036.0332749980957
-      ],
-      "size": [
-        548.1133198706079,
-        85.26510937500007
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 281
-        },
-        {
-          "label": "Enable upscaling",
-          "name": "switch",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "switch"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            282
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [
-          [
-            "-1",
-            "model_name"
-          ],
-          [
-            "-1",
-            "switch"
-          ]
-        ]
-      },
-      "widgets_values": [
-        "nmkdSiaxCX_200k.safetensors",
-        false
-      ]
-    },
     {
       "id": 136,
       "type": "2e2cc58d-2aeb-41a6-90b0-a4d76c57240a",
@@ -147,95 +91,12 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 282
+          "link": 337
         }
       ],
       "outputs": [],
       "properties": {
         "Node name for S&R": "PreviewImage"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 135,
-      "type": "487047c6-8a87-463c-a5ba-eac4fe96d290",
-      "pos": [
-        -1993.4981141862975,
-        1.500897808702888
-      ],
-      "size": [
-        386.66425390625,
-        539.5913125
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 4,
-      "inputs": [
-        {
-          "label": "positive",
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 258
-        },
-        {
-          "label": "negative",
-          "name": "conditioning_1",
-          "type": "CONDITIONING",
-          "link": 259
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 260
-        }
-      ],
-      "outputs": [
-        {
-          "label": "positive",
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            265
-          ]
-        },
-        {
-          "label": "negative",
-          "name": "CONDITIONING_1",
-          "type": "CONDITIONING",
-          "links": [
-            266
-          ]
-        },
-        {
-          "name": "width",
-          "type": "INT",
-          "links": [
-            271
-          ]
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "links": [
-            270
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [
-          [
-            "76",
-            "image"
-          ],
-          [
-            "76",
-            "upload"
-          ],
-          [
-            "76",
-            "$$canvas-image-preview"
-          ]
-        ]
       },
       "widgets_values": []
     },
@@ -313,24 +174,20 @@
       "properties": {
         "proxyWidgets": [
           [
-            "-1",
+            "46",
             "unet_name"
           ],
           [
-            "-1",
+            "39",
             "clip_name"
           ],
           [
-            "-1",
+            "40",
             "vae_name"
           ]
         ]
       },
-      "widgets_values": [
-        "flux-2-klein-9b.safetensors",
-        "qwen_3_8b.safetensors",
-        "flux2-vae.safetensors"
-      ]
+      "widgets_values": []
     },
     {
       "id": 137,
@@ -405,26 +262,26 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            281
+            336
           ]
         }
       ],
       "properties": {
         "proxyWidgets": [
           [
-            "-1",
+            "123",
             "value"
           ],
           [
-            "-1",
-            "value_1"
+            "126",
+            "value"
           ],
           [
-            "-1",
+            "153",
             "sampler_name"
           ],
           [
-            "-1",
+            "139",
             "steps"
           ],
           [
@@ -441,44 +298,30 @@
           ]
         ]
       },
-      "widgets_values": [
-        768,
-        1024,
-        "euler",
-        4
-      ]
+      "widgets_values": []
     },
     {
-      "id": 134,
-      "type": "6d2d9cfd-d063-420a-8110-b6ff72174454",
+      "id": 175,
+      "type": "2eec813c-d96b-4b92-a4ce-2d395d1e2a7e",
       "pos": [
-        -1062.2217011958837,
-        -13.824735626387213
+        -975.6193384016915,
+        1068.1905097096749
       ],
       "size": [
-        610.5322148437499,
-        991.6436210937502
+        424.3014839331081,
+        91.3203125
       ],
       "flags": {},
-      "order": 2,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 255
+          "name": "image",
+          "type": "IMAGE",
+          "link": 336
         },
         {
-          "label": "prompt",
-          "name": "value",
-          "type": "STRING",
-          "widget": {
-            "name": "value"
-          },
-          "link": null
-        },
-        {
-          "label": "Enhance Prompt",
+          "label": "enable",
           "name": "switch",
           "type": "BOOLEAN",
           "widget": {
@@ -489,11 +332,67 @@
       ],
       "outputs": [
         {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            337
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [
+          [
+            "170",
+            "switch"
+          ],
+          [
+            "171",
+            "resolution"
+          ]
+        ]
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 135,
+      "type": "487047c6-8a87-463c-a5ba-eac4fe96d290",
+      "pos": [
+        -1993.4981141862975,
+        1.500897808702888
+      ],
+      "size": [
+        386.66425390625,
+        539.5913125
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 4,
+      "inputs": [
+        {
+          "label": "positive",
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 258
+        },
+        {
+          "label": "negative",
+          "name": "conditioning_1",
+          "type": "CONDITIONING",
+          "link": 259
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 260
+        }
+      ],
+      "outputs": [
+        {
           "label": "positive",
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            258
+            265
           ]
         },
         {
@@ -501,26 +400,41 @@
           "name": "CONDITIONING_1",
           "type": "CONDITIONING",
           "links": [
-            259
+            266
+          ]
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            271
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            270
           ]
         }
       ],
       "properties": {
         "proxyWidgets": [
           [
-            "-1",
-            "value"
+            "162",
+            "image"
           ],
           [
-            "-1",
-            "switch"
+            "162",
+            "upload"
+          ],
+          [
+            "162",
+            "$$canvas-image-preview"
           ]
         ]
       },
-      "widgets_values": [
-        "a bust portrait of a man with his face and neck painted completely white. He has an angular jaw, red lipstick, brown-green eyes with black eyeliner and a retro short hairdo. His hair is black. He stands at 3/4 angle wearing a red shirt and black tie. The background is split diagonally into two halves, the upper half being emerald and the bottom half being yellow.",
-        false
-      ]
+      "widgets_values": []
     },
     {
       "id": 118,
@@ -578,49 +492,107 @@
         },
         {
           "on": false,
-          "lora": "klein9b-detail.safetensors",
-          "strength": 0.7,
-          "strengthTwo": null
-        },
-        {
-          "on": true,
           "lora": "klein9b-mikkoph.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "klein9b-scifi.safetensors",
-          "strength": 1.25,
-          "strengthTwo": null
-        },
-        {
-          "on": false,
-          "lora": "klein9b-dcanchfutre.safetensors",
+          "lora": "klein4b-mikkoph.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "klein9b-obs.safetensors",
+          "lora": "klein4b-mikkoani.safetensors",
           "strength": 1,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "klein9b-dcanchfutre.safetensors",
-          "strength": 1.15,
+          "lora": "None",
+          "strength": 1,
           "strengthTwo": null
         },
         {
           "on": false,
-          "lora": "klein9b-dark.safetensors",
+          "lora": "None",
+          "strength": 1,
+          "strengthTwo": null
+        },
+        {
+          "on": false,
+          "lora": "None",
+          "strength": 1,
+          "strengthTwo": null
+        },
+        {
+          "on": false,
+          "lora": "None",
           "strength": 1,
           "strengthTwo": null
         },
         {},
         ""
       ]
+    },
+    {
+      "id": 134,
+      "type": "6d2d9cfd-d063-420a-8110-b6ff72174454",
+      "pos": [
+        -1062.2217011958837,
+        -13.824735626387213
+      ],
+      "size": [
+        610.5322148437499,
+        991.6436210937502
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 255
+        },
+        {
+          "label": "prompt",
+          "name": "value",
+          "type": "STRING",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "label": "positive",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            258
+          ]
+        },
+        {
+          "label": "negative",
+          "name": "CONDITIONING_1",
+          "type": "CONDITIONING",
+          "links": [
+            259
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [
+          [
+            "164",
+            "text"
+          ]
+        ]
+      },
+      "widgets_values": []
     }
   ],
   "links": [
@@ -745,16 +717,16 @@
       "VAE"
     ],
     [
-      281,
+      336,
       137,
       0,
-      142,
+      175,
       0,
       "IMAGE"
     ],
     [
-      282,
-      142,
+      337,
+      175,
       0,
       99,
       0,
@@ -769,8 +741,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1118,8 +1090,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1226,7 +1198,7 @@
         "widgets": [],
         "nodes": [
           {
-            "id": 76,
+            "id": 156,
             "type": "ReferenceLatent",
             "pos": [
               170,
@@ -1281,7 +1253,7 @@
             "widgets_values": []
           },
           {
-            "id": 78,
+            "id": 157,
             "type": "VAEEncode",
             "pos": [
               -90,
@@ -1294,7 +1266,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 2,
+            "order": 1,
             "mode": 0,
             "inputs": [
               {
@@ -1336,7 +1308,7 @@
             "widgets_values": []
           },
           {
-            "id": 77,
+            "id": 158,
             "type": "ReferenceLatent",
             "pos": [
               170,
@@ -1349,7 +1321,7 @@
             "flags": {
               "collapsed": false
             },
-            "order": 1,
+            "order": 2,
             "mode": 0,
             "inputs": [
               {
@@ -1395,17 +1367,17 @@
         "links": [
           {
             "id": 163,
-            "origin_id": 78,
+            "origin_id": 157,
             "origin_slot": 0,
-            "target_id": 76,
+            "target_id": 156,
             "target_slot": 1,
             "type": "LATENT"
           },
           {
             "id": 164,
-            "origin_id": 78,
+            "origin_id": 157,
             "origin_slot": 0,
-            "target_id": 77,
+            "target_id": 158,
             "target_slot": 1,
             "type": "LATENT"
           },
@@ -1413,7 +1385,7 @@
             "id": 165,
             "origin_id": -10,
             "origin_slot": 0,
-            "target_id": 77,
+            "target_id": 158,
             "target_slot": 0,
             "type": "CONDITIONING"
           },
@@ -1421,7 +1393,7 @@
             "id": 166,
             "origin_id": -10,
             "origin_slot": 1,
-            "target_id": 76,
+            "target_id": 156,
             "target_slot": 0,
             "type": "CONDITIONING"
           },
@@ -1429,7 +1401,7 @@
             "id": 167,
             "origin_id": -10,
             "origin_slot": 2,
-            "target_id": 78,
+            "target_id": 157,
             "target_slot": 0,
             "type": "IMAGE"
           },
@@ -1437,13 +1409,13 @@
             "id": 168,
             "origin_id": -10,
             "origin_slot": 3,
-            "target_id": 78,
+            "target_id": 157,
             "target_slot": 1,
             "type": "VAE"
           },
           {
             "id": 169,
-            "origin_id": 77,
+            "origin_id": 158,
             "origin_slot": 0,
             "target_id": -20,
             "target_slot": 0,
@@ -1451,7 +1423,7 @@
           },
           {
             "id": 170,
-            "origin_id": 76,
+            "origin_id": 156,
             "origin_slot": 0,
             "target_id": -20,
             "target_slot": 1,
@@ -1467,8 +1439,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1689,7 +1661,7 @@
               "secondTabWidth": 65
             },
             "widgets_values": [
-              "flux-2-klein-9b.safetensors",
+              "flux-2-klein-4b.safetensors",
               "default"
             ]
           },
@@ -1748,54 +1720,9 @@
               "secondTabWidth": 65
             },
             "widgets_values": [
-              "qwen_3_8b.safetensors",
+              "qwen_3_4b.safetensors",
               "flux2",
               "default"
-            ]
-          },
-          {
-            "id": 67,
-            "type": "TorchCompileModelAdvanced",
-            "pos": [
-              495.2706581290791,
-              198.04747898201913
-            ],
-            "size": [
-              353.380859375,
-              202
-            ],
-            "flags": {},
-            "order": 4,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "model",
-                "name": "model",
-                "type": "MODEL",
-                "link": 98
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "MODEL",
-                "name": "MODEL",
-                "type": "MODEL",
-                "links": [
-                  99
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "TorchCompileModelAdvanced"
-            },
-            "widgets_values": [
-              "inductor",
-              true,
-              "default",
-              "auto",
-              true,
-              64,
-              false
             ]
           },
           {
@@ -1839,6 +1766,52 @@
               "reduce-overhead",
               true,
               true
+            ]
+          },
+          {
+            "id": 67,
+            "type": "TorchCompileModelAdvanced",
+            "pos": [
+              495.2706581290791,
+              198.04747898201913
+            ],
+            "size": [
+              353.380859375,
+              226
+            ],
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "model",
+                "name": "model",
+                "type": "MODEL",
+                "link": 98
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  99
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "TorchCompileModelAdvanced"
+            },
+            "widgets_values": [
+              "inductor",
+              true,
+              "default",
+              "auto",
+              true,
+              64,
+              false,
+              false
             ]
           }
         ],
@@ -1918,8 +1891,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1931,7 +1904,7 @@
             -1415.94844355656,
             -92.75989318107474,
             120,
-            100
+            80
           ]
         },
         "outputNode": {
@@ -1949,7 +1922,7 @@
             "name": "clip",
             "type": "CLIP",
             "linkIds": [
-              210
+              325
             ],
             "localized_name": "clip",
             "pos": [
@@ -1962,24 +1935,12 @@
             "name": "value",
             "type": "STRING",
             "linkIds": [
-              258
+              327
             ],
             "label": "prompt",
             "pos": [
               -1315.94844355656,
               -52.759893181074744
-            ]
-          },
-          {
-            "id": "432e1bff-b6b6-499d-af76-ec7b8b0ce634",
-            "name": "switch",
-            "type": "BOOLEAN",
-            "linkIds": [
-              263
-            ],
-            "pos": [
-              -1315.94844355656,
-              -32.759893181074744
             ]
           }
         ],
@@ -1989,7 +1950,7 @@
             "name": "CONDITIONING",
             "type": "CONDITIONING",
             "linkIds": [
-              238
+              328
             ],
             "localized_name": "CONDITIONING",
             "label": "positive",
@@ -2027,14 +1988,14 @@
               26
             ],
             "flags": {},
-            "order": 2,
+            "order": 0,
             "mode": 0,
             "inputs": [
               {
                 "localized_name": "conditioning",
                 "name": "conditioning",
                 "type": "CONDITIONING",
-                "link": 239
+                "link": 326
               }
             ],
             "outputs": [
@@ -2062,106 +2023,15 @@
             "widgets_values": []
           },
           {
-            "id": 134,
-            "type": "OAIAPI_Client",
-            "pos": [
-              -1187.4275650431405,
-              304.38596494559397
-            ],
-            "size": [
-              270,
-              130
-            ],
-            "flags": {},
-            "order": 0,
-            "mode": 0,
-            "inputs": [],
-            "outputs": [
-              {
-                "localized_name": "API Client",
-                "name": "API Client",
-                "type": "OAIAPI_CLIENT",
-                "links": [
-                  255
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "OAIAPI_Client"
-            },
-            "widgets_values": [
-              "http://localhost:8000/api/v1",
-              2,
-              600,
-              ""
-            ]
-          },
-          {
-            "id": 138,
-            "type": "ComfySwitchNode",
-            "pos": [
-              -677.7560367775162,
-              44.15198600730679
-            ],
-            "size": [
-              270,
-              78
-            ],
-            "flags": {},
-            "order": 5,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "on_false",
-                "name": "on_false",
-                "type": "STRING",
-                "link": 260
-              },
-              {
-                "localized_name": "on_true",
-                "name": "on_true",
-                "type": "STRING",
-                "link": 262
-              },
-              {
-                "label": "Enhance Prompt",
-                "localized_name": "switch",
-                "name": "switch",
-                "type": "BOOLEAN",
-                "widget": {
-                  "name": "switch"
-                },
-                "link": 263
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "output",
-                "name": "output",
-                "type": "STRING",
-                "links": [
-                  261,
-                  265
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "ComfySwitchNode"
-            },
-            "widgets_values": [
-              false
-            ]
-          },
-          {
-            "id": 108,
+            "id": 164,
             "type": "CLIPTextEncode",
             "pos": [
-              93.18795887312777,
-              -109.0744226235619
+              -408.97895588890447,
+              -55.921019516870075
             ],
             "size": [
-              459.35960807291684,
-              109.94370052083343
+              400,
+              200
             ],
             "flags": {},
             "order": 1,
@@ -2171,7 +2041,7 @@
                 "localized_name": "clip",
                 "name": "clip",
                 "type": "CLIP",
-                "link": 210
+                "link": 325
               },
               {
                 "localized_name": "text",
@@ -2180,7 +2050,7 @@
                 "widget": {
                   "name": "text"
                 },
-                "link": 261
+                "link": 327
               }
             ],
             "outputs": [
@@ -2188,216 +2058,22 @@
                 "localized_name": "CONDITIONING",
                 "name": "CONDITIONING",
                 "type": "CONDITIONING",
-                "slot_index": 0,
                 "links": [
-                  238,
-                  239
+                  326,
+                  328
                 ]
               }
             ],
-            "title": "CLIP Text Encode (Positive Prompt)",
             "properties": {
-              "Node name for S&R": "CLIPTextEncode",
-              "cnr_id": "comfy-core",
-              "ver": "0.8.2",
-              "enableTabs": false,
-              "tabWidth": 65,
-              "tabXOffset": 10,
-              "hasSecondTab": false,
-              "secondTabText": "Send Back",
-              "secondTabOffset": 80,
-              "secondTabWidth": 65
+              "Node name for S&R": "CLIPTextEncode"
             },
             "widgets_values": [
               ""
-            ],
-            "color": "#232",
-            "bgcolor": "#353"
-          },
-          {
-            "id": 139,
-            "type": "PreviewAny",
-            "pos": [
-              78.87544967810844,
-              114.10477782246281
-            ],
-            "size": [
-              547.9596171874996,
-              463.0885585937499
-            ],
-            "flags": {},
-            "order": 6,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "source",
-                "name": "source",
-                "type": "*",
-                "link": 265
-              }
-            ],
-            "outputs": [],
-            "properties": {
-              "Node name for S&R": "PreviewAny"
-            },
-            "widgets_values": [
-              null,
-              null,
-              null
-            ]
-          },
-          {
-            "id": 137,
-            "type": "PrimitiveStringMultiline",
-            "pos": [
-              -1191.2560981564222,
-              30.72538596433798
-            ],
-            "size": [
-              400,
-              200
-            ],
-            "flags": {},
-            "order": 4,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "value",
-                "name": "value",
-                "type": "STRING",
-                "widget": {
-                  "name": "value"
-                },
-                "link": 258
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "STRING",
-                "name": "STRING",
-                "type": "STRING",
-                "links": [
-                  259,
-                  260
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "PrimitiveStringMultiline"
-            },
-            "widgets_values": [
-              "a bust portrait of a man with his face and neck painted completely white. He has an angular jaw, red lipstick, brown-green eyes with black eyeliner and a retro short hairdo. His hair is black. He stands at 3/4 angle wearing a red shirt and black tie. The background is split diagonally into two halves, the upper half being emerald and the bottom half being yellow."
-            ]
-          },
-          {
-            "id": 135,
-            "type": "OAIAPI_ChatCompletion",
-            "pos": [
-              -739.3785179032855,
-              269.9575950971511
-            ],
-            "size": [
-              709.9916015624999,
-              727.0046875
-            ],
-            "flags": {},
-            "order": 3,
-            "mode": 0,
-            "inputs": [
-              {
-                "label": "API Client",
-                "localized_name": "client",
-                "name": "client",
-                "type": "OAIAPI_CLIENT",
-                "link": 255
-              },
-              {
-                "label": "History",
-                "localized_name": "history",
-                "name": "history",
-                "shape": 7,
-                "type": "OAIAPI_HISTORY",
-                "link": null
-              },
-              {
-                "label": "Options",
-                "localized_name": "options",
-                "name": "options",
-                "shape": 7,
-                "type": "OAIAPI_OPTIONS",
-                "link": null
-              },
-              {
-                "label": "image(s)",
-                "localized_name": "images",
-                "name": "images",
-                "shape": 7,
-                "type": "IMAGE",
-                "link": null
-              },
-              {
-                "localized_name": "prompt",
-                "name": "prompt",
-                "type": "STRING",
-                "widget": {
-                  "name": "prompt"
-                },
-                "link": 259
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "Response",
-                "name": "Response",
-                "type": "STRING",
-                "links": [
-                  262
-                ]
-              },
-              {
-                "localized_name": "History",
-                "name": "History",
-                "type": "OAIAPI_HISTORY",
-                "links": null
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "OAIAPI_ChatCompletion"
-            },
-            "widgets_values": [
-              "user.Qwen3-VL-30B-A3B-Instruct",
-              false,
-              "",
-              "You are a prompt enhancement assistant for the FLUX.2 [klein] image generation model. Your role is to transform brief user requests into detailed, novelist-style prose descriptions that maximize image quality.\n\n## Core Principles\n\n**Write Like a Novelist**: Convert keywords into flowing, descriptive prose. Never use comma-separated lists or search-engine style keywords.\n\n**No Upsampling**: FLUX.2 [klein] does NOT auto-enhance prompts. Every detail must be explicitly described.\n\n## Prompt Structure Framework\n\nAlways organize enhanced prompts following this priority order:\n\n1. **Subject** (most important - front-load this)\n2. **Setting** (where the scene takes place)\n3. **Details** (specific visual elements, textures, materials)\n4. **Lighting** (the MOST CRITICAL element - always describe explicitly)\n5. **Atmosphere** (mood and emotional tone)\n\n## Lighting Requirements (HIGHEST PRIORITY)\n\nLighting has the single greatest impact on output quality. ALWAYS include detailed lighting descriptions covering:\n\n- **Source**: natural, artificial, ambient, mixed\n- **Quality**: soft, harsh, diffused, direct, filtered\n- **Direction**: side, back, overhead, fill, camera-left/right\n- **Temperature**: warm, cool, golden, blue hour, neutral\n- **Interaction**: how light catches surfaces, creates shadows, filters through objects, reflects\n\n**Good examples:**\n- \"soft, diffused natural light filtering through sheer curtains\"\n- \"dramatic side lighting creating deep shadows and highlights\"\n- \"golden hour backlighting with lens flare\"\n- \"overcast light creating even, shadow-free illumination\"\n\n**Bad examples:**\n- \"good lighting\"\n- \"nice light\"\n- \"well-lit\"\n\n## Word Order Hierarchy\n\nPlace elements by importance:\n1. Main subject and key action FIRST\n2. Style and visual treatment\n3. Context and environment\n4. Secondary details LAST\n\nThe model pays MORE attention to what comes first.\n\n## Prompt Length Guidelines\n\n- **Short (10-30 words)**: Quick concepts, style tests\n- **Medium (30-80 words)**: Standard production work - USE THIS AS DEFAULT\n- **Long (80-300+ words)**: Complex editorial, highly detailed scenes\n\nOnly extend length when every sentence adds meaningful visual information. Avoid filler.\n\n## Style and Mood Annotations\n\nOptionally append explicit style/mood descriptors at the end:\n\n```\n[Scene description]. Style: [aesthetic descriptor]. Mood: [emotional tone].\n```\n\nExamples:\n- \"Style: Country chic meets luxury lifestyle editorial. Mood: Serene, romantic, grounded.\"\n- \"Shot on 35mm film (Kodak Portra 400) with shallow depth of field—subject razor-sharp, background softly blurred.\"\n\n## Enhancement Process\n\nWhen given a brief user request:\n\n1. Identify the core subject\n2. Expand into flowing prose (NOT keywords)\n3. Add rich sensory details (textures, materials, reflections)\n4. **ALWAYS** add comprehensive lighting description\n5. Include atmospheric elements\n6. Add style/mood annotation if beneficial\n7. Verify word order prioritizes most important elements\n\n## Examples\n\n**User input:** \"woman with blonde hair\"\n\n**Enhanced output:** \"A woman with short, blonde hair is posing against a light, neutral background. She is wearing colorful earrings and a necklace, resting her chin on her hand. Soft, diffused natural light from a large window camera-left creates gentle shadows that define her features, giving the image a warm, minimalist aesthetic.\"\n\n**User input:** \"fisherman on boat\"\n\n**Enhanced output:** \"A weathered fisherman in his late sixties stands at the bow of a small wooden boat, wearing a salt-stained wool sweater, hands gripping frayed rope. Golden hour sunlight filters through morning mist, creating a sense of quiet determination and solitude. The warm backlight catches spray from the waves, while diffused light evenly illuminates his weathered features.\"\n\n## Critical Rules\n\n✅ DO:\n- Write in complete, flowing sentences\n- Front-load the main subject\n- Describe lighting in detail EVERY time\n- Use sensory, evocative language\n- Specify materials, textures, interactions\n\n❌ DON'T:\n- Use comma-separated keyword lists\n- Write vague descriptions (\"good,\" \"nice,\" \"beautiful\")\n- Bury the subject in context\n- Skip lighting details\n- Add filler that doesn't serve the visual\n\n---\n\n**When you receive a user's brief prompt, enhance it following all these guidelines and output ONLY the enhanced prompt, ready for FLUX.2 [klein].**"
             ]
           }
         ],
         "groups": [],
         "links": [
-          {
-            "id": 239,
-            "origin_id": 108,
-            "origin_slot": 0,
-            "target_id": 128,
-            "target_slot": 0,
-            "type": "CONDITIONING"
-          },
-          {
-            "id": 210,
-            "origin_id": -10,
-            "origin_slot": 0,
-            "target_id": 108,
-            "target_slot": 0,
-            "type": "CLIP"
-          },
-          {
-            "id": 238,
-            "origin_id": 108,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 0,
-            "type": "CONDITIONING"
-          },
           {
             "id": 232,
             "origin_id": 128,
@@ -2407,68 +2083,36 @@
             "type": "CONDITIONING"
           },
           {
-            "id": 255,
-            "origin_id": 134,
+            "id": 325,
+            "origin_id": -10,
             "origin_slot": 0,
-            "target_id": 135,
+            "target_id": 164,
             "target_slot": 0,
-            "type": "OAIAPI_CLIENT"
+            "type": "CLIP"
           },
           {
-            "id": 258,
+            "id": 326,
+            "origin_id": 164,
+            "origin_slot": 0,
+            "target_id": 128,
+            "target_slot": 0,
+            "type": "CONDITIONING"
+          },
+          {
+            "id": 327,
             "origin_id": -10,
             "origin_slot": 1,
-            "target_id": 137,
-            "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 259,
-            "origin_id": 137,
-            "origin_slot": 0,
-            "target_id": 135,
-            "target_slot": 4,
-            "type": "STRING"
-          },
-          {
-            "id": 260,
-            "origin_id": 137,
-            "origin_slot": 0,
-            "target_id": 138,
-            "target_slot": 0,
-            "type": "STRING"
-          },
-          {
-            "id": 261,
-            "origin_id": 138,
-            "origin_slot": 0,
-            "target_id": 108,
+            "target_id": 164,
             "target_slot": 1,
             "type": "STRING"
           },
           {
-            "id": 262,
-            "origin_id": 135,
+            "id": 328,
+            "origin_id": 164,
             "origin_slot": 0,
-            "target_id": 138,
-            "target_slot": 1,
-            "type": "STRING"
-          },
-          {
-            "id": 263,
-            "origin_id": -10,
-            "origin_slot": 2,
-            "target_id": 138,
-            "target_slot": 2,
-            "type": "BOOLEAN"
-          },
-          {
-            "id": 265,
-            "origin_id": 138,
-            "origin_slot": 0,
-            "target_id": 139,
+            "target_id": -20,
             "target_slot": 0,
-            "type": "STRING"
+            "type": "CONDITIONING"
           }
         ],
         "extra": {
@@ -2480,8 +2124,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -2602,7 +2246,7 @@
         "widgets": [],
         "nodes": [
           {
-            "id": 76,
+            "id": 162,
             "type": "LoadImage",
             "pos": [
               -2139.4883730730708,
@@ -2843,7 +2487,7 @@
           },
           {
             "id": 254,
-            "origin_id": 76,
+            "origin_id": 162,
             "origin_slot": 0,
             "target_id": 129,
             "target_slot": 0,
@@ -2923,8 +2567,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -3255,8 +2899,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -3719,7 +3363,7 @@
               "randomMin": 0
             },
             "widgets_values": [
-              330901028868944,
+              440036125428872,
               "",
               "",
               ""
@@ -3764,7 +3408,7 @@
               "Node name for S&R": "RandomNoise"
             },
             "widgets_values": [
-              144521164933187,
+              1097636600080249,
               "randomize"
             ]
           },
@@ -4264,12 +3908,12 @@
         }
       },
       {
-        "id": "f2a4744d-e70e-4aac-ba41-f86eeafb1438",
+        "id": "2eec813c-d96b-4b92-a4ce-2d395d1e2a7e",
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 155,
-          "lastLinkId": 321,
+          "lastNodeId": 175,
+          "lastLinkId": 337,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -4287,8 +3931,8 @@
         "outputNode": {
           "id": -20,
           "bounding": [
-            1239.7182660947003,
-            466.5503526024877,
+            1627.249125469701,
+            273.2197666649876,
             120,
             60
           ]
@@ -4299,8 +3943,9 @@
             "name": "image",
             "type": "IMAGE",
             "linkIds": [
-              100,
-              105
+              286,
+              289,
+              312
             ],
             "localized_name": "image",
             "pos": [
@@ -4309,23 +3954,24 @@
             ]
           },
           {
-            "id": "44ef287e-3c3c-4d90-8de5-7e3fe7ad577d",
-            "name": "model_name",
-            "type": "COMBO",
+            "id": "58ceaea8-2b8c-400f-b04b-65490b54e886",
+            "name": "switch",
+            "type": "BOOLEAN",
             "linkIds": [
-              104
+              108
             ],
+            "label": "enable",
             "pos": [
               535.2074660753912,
               460.70549213372635
             ]
           },
           {
-            "id": "58ceaea8-2b8c-400f-b04b-65490b54e886",
-            "name": "switch",
-            "type": "BOOLEAN",
+            "id": "7defee6b-8e2c-40e3-a19e-98614987d358",
+            "name": "resolution",
+            "type": "INT",
             "linkIds": [
-              108
+              311
             ],
             "pos": [
               535.2074660753912,
@@ -4343,124 +3989,39 @@
             ],
             "localized_name": "IMAGE",
             "pos": [
-              1259.7182660947003,
-              486.5503526024877
+              1647.249125469701,
+              293.2197666649876
             ]
           }
         ],
         "widgets": [],
         "nodes": [
           {
-            "id": 78,
-            "type": "UpscaleModelLoader",
-            "pos": [
-              769.9380117673563,
-              308.7349646810404
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {},
-            "order": 1,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "model_name",
-                "name": "model_name",
-                "type": "COMBO",
-                "widget": {
-                  "name": "model_name"
-                },
-                "link": 104
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "UPSCALE_MODEL",
-                "name": "UPSCALE_MODEL",
-                "type": "UPSCALE_MODEL",
-                "links": [
-                  103
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "UpscaleModelLoader"
-            },
-            "widgets_values": [
-              "nmkdSiaxCX_200k.safetensors"
-            ]
-          },
-          {
-            "id": 75,
-            "type": "ImageUpscaleWithModel",
-            "pos": [
-              801.0556976137666,
-              438.34217011214423
-            ],
-            "size": [
-              267.71489039778305,
-              85.04367204653579
-            ],
-            "flags": {},
-            "order": 0,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "upscale_model",
-                "name": "upscale_model",
-                "type": "UPSCALE_MODEL",
-                "link": 103
-              },
-              {
-                "localized_name": "image",
-                "name": "image",
-                "type": "IMAGE",
-                "link": 100
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  106
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "ImageUpscaleWithModel"
-            },
-            "widgets_values": []
-          },
-          {
-            "id": 79,
+            "id": 170,
             "type": "ComfySwitchNode",
             "pos": [
-              813.6661676657333,
-              597.1009364585898
+              1198.462133574824,
+              443.2401616652015
             ],
             "size": [
               270,
               78
             ],
             "flags": {},
-            "order": 2,
+            "order": 3,
             "mode": 0,
             "inputs": [
               {
                 "localized_name": "on_false",
                 "name": "on_false",
                 "type": "IMAGE",
-                "link": 105
+                "link": 289
               },
               {
                 "localized_name": "on_true",
                 "name": "on_true",
                 "type": "IMAGE",
-                "link": 106
+                "link": 310
               },
               {
                 "localized_name": "switch",
@@ -4488,53 +4049,225 @@
             "widgets_values": [
               false
             ]
+          },
+          {
+            "id": 171,
+            "type": "SeedVR2VideoUpscaler",
+            "pos": [
+              1164.6850624652236,
+              -40.77301208148238
+            ],
+            "size": [
+              329.956640625,
+              386
+            ],
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "image",
+                "name": "image",
+                "type": "IMAGE",
+                "link": 312
+              },
+              {
+                "localized_name": "dit",
+                "name": "dit",
+                "type": "SEEDVR2_DIT",
+                "link": 308
+              },
+              {
+                "localized_name": "vae",
+                "name": "vae",
+                "type": "SEEDVR2_VAE",
+                "link": 309
+              },
+              {
+                "localized_name": "resolution",
+                "name": "resolution",
+                "type": "INT",
+                "widget": {
+                  "name": "resolution"
+                },
+                "link": 311
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  310
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "SeedVR2VideoUpscaler"
+            },
+            "widgets_values": [
+              42,
+              "fixed",
+              2048,
+              0,
+              1,
+              false,
+              "lab",
+              0,
+              0,
+              0,
+              0,
+              "none",
+              false
+            ]
+          },
+          {
+            "id": 172,
+            "type": "SeedVR2LoadDiTModel",
+            "pos": [
+              713.1684679230135,
+              135.18613675027896
+            ],
+            "size": [
+              307.6646484375,
+              202
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "torch_compile_args",
+                "name": "torch_compile_args",
+                "shape": 7,
+                "type": "TORCH_COMPILE_ARGS",
+                "link": 306
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "SEEDVR2_DIT",
+                "name": "SEEDVR2_DIT",
+                "type": "SEEDVR2_DIT",
+                "links": [
+                  308
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "SeedVR2LoadDiTModel",
+              "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+              "ver": "690cc39379c1481159ddd451368dbf2295930fc6"
+            },
+            "widgets_values": [
+              "seedvr2_ema_7b_sharp_fp16.safetensors",
+              "cuda:0",
+              0,
+              false,
+              "none",
+              false,
+              "sdpa"
+            ]
+          },
+          {
+            "id": 173,
+            "type": "SeedVR2TorchCompileSettings",
+            "pos": [
+              715.5067761316262,
+              -115.96412563593424
+            ],
+            "size": [
+              307.671484375,
+              178
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [],
+            "outputs": [
+              {
+                "localized_name": "TORCH_COMPILE_ARGS",
+                "name": "TORCH_COMPILE_ARGS",
+                "type": "TORCH_COMPILE_ARGS",
+                "links": [
+                  306,
+                  307
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "SeedVR2TorchCompileSettings",
+              "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+              "ver": "690cc39379c1481159ddd451368dbf2295930fc6"
+            },
+            "widgets_values": [
+              "inductor",
+              "default",
+              false,
+              false,
+              64,
+              128
+            ]
+          },
+          {
+            "id": 174,
+            "type": "SeedVR2LoadVAEModel",
+            "pos": [
+              699.5561241730135,
+              425.5728555002813
+            ],
+            "size": [
+              312.866796875,
+              298
+            ],
+            "flags": {},
+            "order": 2,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "torch_compile_args",
+                "name": "torch_compile_args",
+                "shape": 7,
+                "type": "TORCH_COMPILE_ARGS",
+                "link": 307
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "SEEDVR2_VAE",
+                "name": "SEEDVR2_VAE",
+                "type": "SEEDVR2_VAE",
+                "links": [
+                  309
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "SeedVR2LoadVAEModel",
+              "aux_id": "ainvfx/ComfyUI-SeedVR2_VideoUpscaler",
+              "ver": "690cc39379c1481159ddd451368dbf2295930fc6"
+            },
+            "widgets_values": [
+              "ema_vae_fp16.safetensors",
+              "cuda:0",
+              false,
+              1024,
+              128,
+              false,
+              1024,
+              128,
+              "false",
+              "none",
+              false
+            ]
           }
         ],
         "groups": [],
         "links": [
           {
-            "id": 103,
-            "origin_id": 78,
-            "origin_slot": 0,
-            "target_id": 75,
-            "target_slot": 0,
-            "type": "UPSCALE_MODEL"
-          },
-          {
-            "id": 100,
-            "origin_id": -10,
-            "origin_slot": 0,
-            "target_id": 75,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
-            "id": 104,
-            "origin_id": -10,
-            "origin_slot": 1,
-            "target_id": 78,
-            "target_slot": 0,
-            "type": "COMBO"
-          },
-          {
-            "id": 105,
-            "origin_id": -10,
-            "origin_slot": 0,
-            "target_id": 79,
-            "target_slot": 0,
-            "type": "IMAGE"
-          },
-          {
-            "id": 106,
-            "origin_id": 75,
-            "origin_slot": 0,
-            "target_id": 79,
-            "target_slot": 1,
-            "type": "IMAGE"
-          },
-          {
             "id": 107,
-            "origin_id": 79,
+            "origin_id": 170,
             "origin_slot": 0,
             "target_id": -20,
             "target_slot": 0,
@@ -4543,10 +4276,82 @@
           {
             "id": 108,
             "origin_id": -10,
-            "origin_slot": 2,
-            "target_id": 79,
+            "origin_slot": 1,
+            "target_id": 170,
             "target_slot": 2,
             "type": "BOOLEAN"
+          },
+          {
+            "id": 286,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 148,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 289,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 170,
+            "target_slot": 0,
+            "type": "IMAGE"
+          },
+          {
+            "id": 306,
+            "origin_id": 173,
+            "origin_slot": 0,
+            "target_id": 172,
+            "target_slot": 0,
+            "type": "TORCH_COMPILE_ARGS"
+          },
+          {
+            "id": 307,
+            "origin_id": 173,
+            "origin_slot": 0,
+            "target_id": 174,
+            "target_slot": 0,
+            "type": "TORCH_COMPILE_ARGS"
+          },
+          {
+            "id": 308,
+            "origin_id": 172,
+            "origin_slot": 0,
+            "target_id": 171,
+            "target_slot": 1,
+            "type": "SEEDVR2_DIT"
+          },
+          {
+            "id": 309,
+            "origin_id": 174,
+            "origin_slot": 0,
+            "target_id": 171,
+            "target_slot": 2,
+            "type": "SEEDVR2_VAE"
+          },
+          {
+            "id": 310,
+            "origin_id": 171,
+            "origin_slot": 0,
+            "target_id": 170,
+            "target_slot": 1,
+            "type": "IMAGE"
+          },
+          {
+            "id": 311,
+            "origin_id": -10,
+            "origin_slot": 2,
+            "target_id": 171,
+            "target_slot": 3,
+            "type": "INT"
+          },
+          {
+            "id": 312,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 171,
+            "target_slot": 0,
+            "type": "IMAGE"
           }
         ],
         "extra": {
@@ -4557,21 +4362,16 @@
   },
   "config": {},
   "extra": {
-    "frontendVersion": "1.39.16",
+    "frontendVersion": "1.41.20",
     "workflowRendererVersion": "LG",
-    "VHS_latentpreview": false,
-    "VHS_latentpreviewrate": 0,
-    "VHS_MetadataImage": true,
-    "VHS_KeepIntermediate": true,
     "linearMode": false,
     "ds": {
-      "scale": 0.8839447422783082,
+      "scale": 0.8035861293439152,
       "offset": [
-        2125.001490512815,
-        280.36949368741995
+        2539.5677682273013,
+        342.4781002033604
       ]
-    },
-    "ovum.cudnn-wrapper-enabled": true
+    }
   },
   "version": 0.4
 }
