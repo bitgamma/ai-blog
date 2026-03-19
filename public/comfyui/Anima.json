@@ -1,92 +1,9 @@
 {
   "id": "61da3142-7797-4d79-8626-ed1c9bbb2451",
   "revision": 0,
-  "last_node_id": 171,
-  "last_link_id": 335,
+  "last_node_id": 179,
+  "last_link_id": 355,
   "nodes": [
-    {
-      "id": 4,
-      "type": "7e999ea0-2500-4200-8d19-a99bb9b3bcae",
-      "pos": [
-        -1794.7310526074023,
-        39.809914506747134
-      ],
-      "size": [
-        465.10997091913634,
-        146
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            4
-          ]
-        },
-        {
-          "name": "CLIP",
-          "type": "CLIP",
-          "links": [
-            5
-          ]
-        },
-        {
-          "name": "VAE",
-          "type": "VAE",
-          "links": [
-            6
-          ]
-        }
-      ],
-      "properties": {
-        "proxyWidgets": [
-          [
-            "92",
-            "unet_name"
-          ],
-          [
-            "93",
-            "clip_name"
-          ],
-          [
-            "94",
-            "vae_name"
-          ]
-        ]
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 3,
-      "type": "PreviewImage",
-      "pos": [
-        -585.338977508399,
-        61.72011838938488
-      ],
-      "size": [
-        775.1430833525578,
-        936.626608773683
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 335
-        }
-      ],
-      "outputs": [],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      },
-      "widgets_values": []
-    },
     {
       "id": 170,
       "type": "8be5e8a3-6dd8-4989-b2fc-88a7b000124c",
@@ -141,11 +58,94 @@
       "widgets_values": []
     },
     {
+      "id": 3,
+      "type": "PreviewImage",
+      "pos": [
+        -611.1765153275693,
+        30.2210132306474
+      ],
+      "size": [
+        775.1430833525578,
+        936.626608773683
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 335
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 178,
+      "type": "98da4d0f-0a13-4ba1-8cfa-2546e7169808",
+      "pos": [
+        -1790.2864151957626,
+        49.87921495595224
+      ],
+      "size": [
+        447.26209980613294,
+        149.27524490033954
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            350
+          ]
+        },
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            351
+          ]
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            352
+          ]
+        }
+      ],
+      "properties": {
+        "proxyWidgets": [
+          [
+            "174",
+            "unet_name"
+          ],
+          [
+            "173",
+            "clip_name"
+          ],
+          [
+            "176",
+            "vae_name"
+          ]
+        ]
+      },
+      "widgets_values": []
+    },
+    {
       "id": 6,
       "type": "deedd596-c15d-406e-8432-66db6e4fa729",
       "pos": [
-        -1796.5730047700813,
-        616.0225251589866
+        -1801.0660929746703,
+        576.7309388916314
       ],
       "size": [
         482.9522452600979,
@@ -160,7 +160,7 @@
         {
           "name": "vae",
           "type": "VAE",
-          "link": 6
+          "link": 352
         },
         {
           "name": "model",
@@ -249,13 +249,13 @@
           "dir": 3,
           "name": "model",
           "type": "MODEL",
-          "link": 4
+          "link": 351
         },
         {
           "dir": 3,
           "name": "clip",
           "type": "CLIP",
-          "link": 5
+          "link": 350
         }
       ],
       "outputs": [
@@ -396,30 +396,6 @@
       "CLIP"
     ],
     [
-      4,
-      4,
-      0,
-      5,
-      0,
-      "MODEL"
-    ],
-    [
-      5,
-      4,
-      1,
-      5,
-      1,
-      "CLIP"
-    ],
-    [
-      6,
-      4,
-      2,
-      6,
-      0,
-      "VAE"
-    ],
-    [
       7,
       5,
       0,
@@ -458,6 +434,30 @@
       3,
       0,
       "IMAGE"
+    ],
+    [
+      350,
+      178,
+      0,
+      5,
+      1,
+      "CLIP"
+    ],
+    [
+      351,
+      178,
+      1,
+      5,
+      0,
+      "MODEL"
+    ],
+    [
+      352,
+      178,
+      2,
+      6,
+      0,
+      "VAE"
     ]
   ],
   "groups": [],
@@ -468,8 +468,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 171,
-          "lastLinkId": 335,
+          "lastNodeId": 179,
+          "lastLinkId": 355,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -722,422 +722,12 @@
         }
       },
       {
-        "id": "7e999ea0-2500-4200-8d19-a99bb9b3bcae",
-        "version": 1,
-        "state": {
-          "lastGroupId": 4,
-          "lastNodeId": 171,
-          "lastLinkId": 335,
-          "lastRerouteId": 0
-        },
-        "revision": 0,
-        "config": {},
-        "name": "Load Checkpoint",
-        "inputNode": {
-          "id": -10,
-          "bounding": [
-            -841.1105242910379,
-            23.183437601646204,
-            120,
-            100
-          ]
-        },
-        "outputNode": {
-          "id": -20,
-          "bounding": [
-            257.42573011606555,
-            -6.8165623983537955,
-            120,
-            100
-          ]
-        },
-        "inputs": [
-          {
-            "id": "b14eaf28-ff9c-4503-988f-c83634c01fdd",
-            "name": "ckpt_name",
-            "type": "COMBO",
-            "linkIds": [
-              140
-            ],
-            "pos": [
-              -741.1105242910379,
-              43.183437601646204
-            ]
-          },
-          {
-            "id": "d1e8507d-3203-4f69-9630-34fb91bdb99b",
-            "name": "clip_name",
-            "type": "COMBO",
-            "linkIds": [
-              141
-            ],
-            "pos": [
-              -741.1105242910379,
-              63.183437601646204
-            ]
-          },
-          {
-            "id": "9765c2ff-7da3-4ebb-a2c4-f8365b1b89ef",
-            "name": "vae_name",
-            "type": "COMBO",
-            "linkIds": [
-              142
-            ],
-            "pos": [
-              -741.1105242910379,
-              83.1834376016462
-            ]
-          }
-        ],
-        "outputs": [
-          {
-            "id": "4069a102-2acd-46de-8ce2-ce077fc59cdc",
-            "name": "MODEL",
-            "type": "MODEL",
-            "linkIds": [
-              136
-            ],
-            "localized_name": "MODEL",
-            "pos": [
-              277.42573011606555,
-              13.183437601646204
-            ]
-          },
-          {
-            "id": "4d27f6f3-d7dd-4137-a6db-f47d11c91cc5",
-            "name": "CLIP",
-            "type": "CLIP",
-            "linkIds": [
-              139
-            ],
-            "localized_name": "CLIP",
-            "pos": [
-              277.42573011606555,
-              33.183437601646204
-            ]
-          },
-          {
-            "id": "c9d2c936-0222-4736-aadd-8a93acc6d323",
-            "name": "VAE",
-            "type": "VAE",
-            "linkIds": [
-              143
-            ],
-            "localized_name": "VAE",
-            "pos": [
-              277.42573011606555,
-              53.183437601646204
-            ]
-          }
-        ],
-        "widgets": [],
-        "nodes": [
-          {
-            "id": 94,
-            "type": "VAELoader",
-            "pos": [
-              -604.0010865148905,
-              314.4266836477175
-            ],
-            "size": [
-              270,
-              58
-            ],
-            "flags": {},
-            "order": 4,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "vae_name",
-                "name": "vae_name",
-                "type": "COMBO",
-                "widget": {
-                  "name": "vae_name"
-                },
-                "link": 142
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "VAE",
-                "name": "VAE",
-                "type": "VAE",
-                "links": [
-                  137
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "VAELoader"
-            },
-            "widgets_values": [
-              "qwen_image_vae.safetensors"
-            ]
-          },
-          {
-            "id": 93,
-            "type": "CLIPLoader",
-            "pos": [
-              -607.2300586401627,
-              89.9533784442858
-            ],
-            "size": [
-              270,
-              106
-            ],
-            "flags": {},
-            "order": 3,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "clip_name",
-                "name": "clip_name",
-                "type": "COMBO",
-                "widget": {
-                  "name": "clip_name"
-                },
-                "link": 141
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "CLIP",
-                "name": "CLIP",
-                "type": "CLIP",
-                "links": [
-                  139
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "CLIPLoader"
-            },
-            "widgets_values": [
-              "qwen_3_06b_base.safetensors",
-              "stable_diffusion",
-              "default"
-            ]
-          },
-          {
-            "id": 92,
-            "type": "UNETLoader",
-            "pos": [
-              -606.0418675880497,
-              -109.48027699617515
-            ],
-            "size": [
-              270,
-              82
-            ],
-            "flags": {},
-            "order": 2,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "unet_name",
-                "name": "unet_name",
-                "type": "COMBO",
-                "widget": {
-                  "name": "unet_name"
-                },
-                "link": 140
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "MODEL",
-                "name": "MODEL",
-                "type": "MODEL",
-                "links": [
-                  138
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "UNETLoader"
-            },
-            "widgets_values": [
-              "anima-preview2.safetensors",
-              "default"
-            ]
-          },
-          {
-            "id": 91,
-            "type": "TorchCompileModelAdvanced",
-            "pos": [
-              -158.26644180117063,
-              -166.72986095082476
-            ],
-            "size": [
-              353.380859375,
-              226
-            ],
-            "flags": {},
-            "order": 1,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "model",
-                "name": "model",
-                "type": "MODEL",
-                "link": 138
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "MODEL",
-                "name": "MODEL",
-                "type": "MODEL",
-                "links": [
-                  136
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "TorchCompileModelAdvanced"
-            },
-            "widgets_values": [
-              "inductor",
-              true,
-              "default",
-              "auto",
-              true,
-              64,
-              false,
-              false
-            ]
-          },
-          {
-            "id": 90,
-            "type": "TorchCompileVAE",
-            "pos": [
-              -156.3409631953593,
-              310.0184677490196
-            ],
-            "size": [
-              270,
-              154
-            ],
-            "flags": {},
-            "order": 0,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "vae",
-                "name": "vae",
-                "type": "VAE",
-                "link": 137
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "VAE",
-                "name": "VAE",
-                "type": "VAE",
-                "links": [
-                  135,
-                  143
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "TorchCompileVAE"
-            },
-            "widgets_values": [
-              "inductor",
-              false,
-              "reduce-overhead",
-              true,
-              true
-            ]
-          }
-        ],
-        "groups": [],
-        "links": [
-          {
-            "id": 135,
-            "origin_id": 90,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 2,
-            "type": "VAE"
-          },
-          {
-            "id": 136,
-            "origin_id": 91,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 0,
-            "type": "MODEL"
-          },
-          {
-            "id": 137,
-            "origin_id": 94,
-            "origin_slot": 0,
-            "target_id": 90,
-            "target_slot": 0,
-            "type": "VAE"
-          },
-          {
-            "id": 138,
-            "origin_id": 92,
-            "origin_slot": 0,
-            "target_id": 91,
-            "target_slot": 0,
-            "type": "MODEL"
-          },
-          {
-            "id": 139,
-            "origin_id": 93,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 1,
-            "type": "CLIP"
-          },
-          {
-            "id": 140,
-            "origin_id": -10,
-            "origin_slot": 0,
-            "target_id": 92,
-            "target_slot": 0,
-            "type": "COMBO"
-          },
-          {
-            "id": 141,
-            "origin_id": -10,
-            "origin_slot": 1,
-            "target_id": 93,
-            "target_slot": 0,
-            "type": "COMBO"
-          },
-          {
-            "id": 142,
-            "origin_id": -10,
-            "origin_slot": 2,
-            "target_id": 94,
-            "target_slot": 0,
-            "type": "COMBO"
-          },
-          {
-            "id": 143,
-            "origin_id": 90,
-            "origin_slot": 0,
-            "target_id": -20,
-            "target_slot": 2,
-            "type": "VAE"
-          }
-        ],
-        "extra": {
-          "workflowRendererVersion": "LG"
-        }
-      },
-      {
         "id": "deedd596-c15d-406e-8432-66db6e4fa729",
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 171,
-          "lastLinkId": 335,
+          "lastNodeId": 179,
+          "lastLinkId": 355,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -1335,54 +925,11 @@
               "randomMin": 0
             },
             "widgets_values": [
-              12084250233531,
+              407834844309905,
               "",
-              "",
+              null,
               ""
             ]
-          },
-          {
-            "id": 78,
-            "type": "VAEDecode",
-            "pos": [
-              850.1236698561559,
-              716.2930219063982
-            ],
-            "size": [
-              306.86630734376376,
-              46
-            ],
-            "flags": {},
-            "order": 1,
-            "mode": 0,
-            "inputs": [
-              {
-                "localized_name": "samples",
-                "name": "samples",
-                "type": "LATENT",
-                "link": 167
-              },
-              {
-                "localized_name": "vae",
-                "name": "vae",
-                "type": "VAE",
-                "link": 93
-              }
-            ],
-            "outputs": [
-              {
-                "localized_name": "IMAGE",
-                "name": "IMAGE",
-                "type": "IMAGE",
-                "links": [
-                  94
-                ]
-              }
-            ],
-            "properties": {
-              "Node name for S&R": "VAEDecode"
-            },
-            "widgets_values": []
           },
           {
             "id": 98,
@@ -1536,7 +1083,7 @@
               "Node name for S&R": "KSampler"
             },
             "widgets_values": [
-              666264696184883,
+              346945450981836,
               "randomize",
               8,
               1,
@@ -1544,6 +1091,49 @@
               "simple",
               1
             ]
+          },
+          {
+            "id": 78,
+            "type": "VAEDecode",
+            "pos": [
+              850.1236698561559,
+              716.2930219063982
+            ],
+            "size": [
+              306.86630734376376,
+              46
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "samples",
+                "name": "samples",
+                "type": "LATENT",
+                "link": 167
+              },
+              {
+                "localized_name": "vae",
+                "name": "vae",
+                "type": "VAE",
+                "link": 93
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "IMAGE",
+                "name": "IMAGE",
+                "type": "IMAGE",
+                "links": [
+                  94
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAEDecode"
+            },
+            "widgets_values": []
           }
         ],
         "groups": [],
@@ -1670,8 +1260,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 4,
-          "lastNodeId": 171,
-          "lastLinkId": 335,
+          "lastNodeId": 179,
+          "lastLinkId": 355,
           "lastRerouteId": 0
         },
         "revision": 0,
@@ -2115,24 +1705,448 @@
         "extra": {
           "workflowRendererVersion": "LG"
         }
+      },
+      {
+        "id": "98da4d0f-0a13-4ba1-8cfa-2546e7169808",
+        "version": 1,
+        "state": {
+          "lastGroupId": 4,
+          "lastNodeId": 179,
+          "lastLinkId": 355,
+          "lastRerouteId": 0
+        },
+        "revision": 0,
+        "config": {},
+        "name": "AnimaLoader",
+        "inputNode": {
+          "id": -10,
+          "bounding": [
+            -2143.34830525483,
+            77.80991450674713,
+            120,
+            100
+          ]
+        },
+        "outputNode": {
+          "id": -20,
+          "bounding": [
+            -1101.0038290408381,
+            47.809914506747134,
+            120,
+            100
+          ]
+        },
+        "inputs": [
+          {
+            "id": "01c777e3-936b-4f0d-9977-a9d36f3b810e",
+            "name": "unet_name",
+            "type": "COMBO",
+            "linkIds": [
+              353
+            ],
+            "pos": [
+              -2043.34830525483,
+              97.80991450674713
+            ]
+          },
+          {
+            "id": "86802c6e-261b-474e-93b3-b455c0bf9123",
+            "name": "clip_name",
+            "type": "COMBO",
+            "linkIds": [
+              354
+            ],
+            "pos": [
+              -2043.34830525483,
+              117.80991450674713
+            ]
+          },
+          {
+            "id": "45615b4c-f38f-42a7-800b-14f2a02f204d",
+            "name": "vae_name",
+            "type": "COMBO",
+            "linkIds": [
+              355
+            ],
+            "pos": [
+              -2043.34830525483,
+              137.80991450674713
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "403d264b-1fdd-43a5-8886-0dfa2e71f004",
+            "name": "CLIP",
+            "type": "CLIP",
+            "linkIds": [
+              347
+            ],
+            "localized_name": "CLIP",
+            "pos": [
+              -1081.0038290408381,
+              67.80991450674713
+            ]
+          },
+          {
+            "id": "6695b350-2caa-4ce2-a11e-c6e5e975b3b6",
+            "name": "MODEL",
+            "type": "MODEL",
+            "linkIds": [
+              345
+            ],
+            "localized_name": "MODEL",
+            "pos": [
+              -1081.0038290408381,
+              87.80991450674713
+            ]
+          },
+          {
+            "id": "3fcedc79-75fc-4927-ba50-ec8a5ab0339e",
+            "name": "VAE",
+            "type": "VAE",
+            "linkIds": [
+              349
+            ],
+            "localized_name": "VAE",
+            "pos": [
+              -1081.0038290408381,
+              107.80991450674713
+            ]
+          }
+        ],
+        "widgets": [],
+        "nodes": [
+          {
+            "id": 175,
+            "type": "TorchCompileModelAdvanced",
+            "pos": [
+              -1514.3846884158381,
+              -170.67268585853327
+            ],
+            "size": [
+              353.380859375,
+              226
+            ],
+            "flags": {},
+            "order": 2,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "model",
+                "name": "model",
+                "type": "MODEL",
+                "link": 346
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  345
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "TorchCompileModelAdvanced"
+            },
+            "widgets_values": [
+              "inductor",
+              true,
+              "default",
+              "auto",
+              true,
+              64,
+              false,
+              false
+            ]
+          },
+          {
+            "id": 174,
+            "type": "UNETLoader",
+            "pos": [
+              -1962.160114202717,
+              -113.42310190388366
+            ],
+            "size": [
+              270,
+              82
+            ],
+            "flags": {},
+            "order": 1,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "unet_name",
+                "name": "unet_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "unet_name"
+                },
+                "link": 353
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "MODEL",
+                "name": "MODEL",
+                "type": "MODEL",
+                "links": [
+                  346
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "UNETLoader"
+            },
+            "widgets_values": [
+              "anima-preview2.safetensors",
+              "default"
+            ]
+          },
+          {
+            "id": 173,
+            "type": "CLIPLoader",
+            "pos": [
+              -1963.3483052548302,
+              86.01055353657729
+            ],
+            "size": [
+              270,
+              106
+            ],
+            "flags": {},
+            "order": 0,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "clip_name",
+                "name": "clip_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "clip_name"
+                },
+                "link": 354
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "CLIP",
+                "name": "CLIP",
+                "type": "CLIP",
+                "links": [
+                  347
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "CLIPLoader"
+            },
+            "widgets_values": [
+              "qwen_3_06b_base.safetensors",
+              "stable_diffusion",
+              "default"
+            ]
+          },
+          {
+            "id": 176,
+            "type": "VAELoader",
+            "pos": [
+              -1960.119333129558,
+              310.48385874000894
+            ],
+            "size": [
+              270,
+              58
+            ],
+            "flags": {},
+            "order": 3,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "vae_name",
+                "name": "vae_name",
+                "type": "COMBO",
+                "widget": {
+                  "name": "vae_name"
+                },
+                "link": 355
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "VAE",
+                "name": "VAE",
+                "type": "VAE",
+                "links": [
+                  348
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "VAELoader"
+            },
+            "widgets_values": [
+              "qwen_image_vae.safetensors"
+            ]
+          },
+          {
+            "id": 177,
+            "type": "TorchCompileVAE",
+            "pos": [
+              -1514.2102376684625,
+              242.29251487202757
+            ],
+            "size": [
+              270,
+              154
+            ],
+            "flags": {},
+            "order": 4,
+            "mode": 0,
+            "inputs": [
+              {
+                "localized_name": "vae",
+                "name": "vae",
+                "type": "VAE",
+                "link": 348
+              }
+            ],
+            "outputs": [
+              {
+                "localized_name": "VAE",
+                "name": "VAE",
+                "type": "VAE",
+                "links": [
+                  349
+                ]
+              }
+            ],
+            "properties": {
+              "Node name for S&R": "TorchCompileVAE"
+            },
+            "widgets_values": [
+              "inductor",
+              false,
+              "reduce-overhead",
+              true,
+              true
+            ]
+          }
+        ],
+        "groups": [],
+        "links": [
+          {
+            "id": 346,
+            "origin_id": 174,
+            "origin_slot": 0,
+            "target_id": 175,
+            "target_slot": 0,
+            "type": "MODEL"
+          },
+          {
+            "id": 348,
+            "origin_id": 176,
+            "origin_slot": 0,
+            "target_id": 177,
+            "target_slot": 0,
+            "type": "VAE"
+          },
+          {
+            "id": 347,
+            "origin_id": 173,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 0,
+            "type": "CLIP"
+          },
+          {
+            "id": 345,
+            "origin_id": 175,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 1,
+            "type": "MODEL"
+          },
+          {
+            "id": 349,
+            "origin_id": 177,
+            "origin_slot": 0,
+            "target_id": -20,
+            "target_slot": 2,
+            "type": "VAE"
+          },
+          {
+            "id": 353,
+            "origin_id": -10,
+            "origin_slot": 0,
+            "target_id": 174,
+            "target_slot": 0,
+            "type": "COMBO"
+          },
+          {
+            "id": 354,
+            "origin_id": -10,
+            "origin_slot": 1,
+            "target_id": 173,
+            "target_slot": 0,
+            "type": "COMBO"
+          },
+          {
+            "id": 355,
+            "origin_id": -10,
+            "origin_slot": 2,
+            "target_id": 176,
+            "target_slot": 0,
+            "type": "COMBO"
+          }
+        ],
+        "extra": {}
       }
     ]
   },
   "config": {},
   "extra": {
     "workflowRendererVersion": "LG",
-    "frontendVersion": "1.41.20",
+    "frontendVersion": "1.41.21",
+    "ovum.cudnn-wrapper-enabled": true,
     "linearData": {
-      "inputs": [],
-      "outputs": []
+      "inputs": [
+        [
+          "98",
+          "width"
+        ],
+        [
+          "98",
+          "height"
+        ],
+        [
+          "99",
+          "steps"
+        ],
+        [
+          "99",
+          "sampler_name"
+        ],
+        [
+          "64",
+          "🎲 New Fixed Random"
+        ]
+      ],
+      "outputs": [
+        3
+      ]
     },
     "ds": {
-      "scale": 1.137704865114414,
+      "scale": 0.9302739467464449,
       "offset": [
-        2270.0813833176435,
-        130.44251100580996
+        2262.2076733475415,
+        255.19161953444248
       ]
-    }
+    },
+    "linearMode": false
   },
   "version": 0.4
 }
