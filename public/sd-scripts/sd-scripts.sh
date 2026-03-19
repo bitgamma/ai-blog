@@ -76,12 +76,12 @@ init_env() {
         sdxl) 
             TRAINING_SCRIPT="sdxl_train_network.py"
             NETWORK_MODULE="networks.lora"
-            EXTRA_TRAINING_CONFIG="--cache_latents"
+            EXTRA_TRAINING_CONFIG="cache_latents = true"
             ;;
         anima)
             TRAINING_SCRIPT="anima_train_network.py"
             NETWORK_MODULE="networks.lora_anima"
-            EXTRA_TRAINING_CONFIG="--cache_latents"
+            EXTRA_TRAINING_CONFIG="cache_latents = true"
             ;;
         *)
             log_error "MODEL_VERSION must be 'sdxl' or 'anima'."
