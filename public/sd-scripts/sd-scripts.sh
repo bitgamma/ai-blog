@@ -18,12 +18,12 @@ DIT_MODEL="${DIT_MODEL:-}"  # Path to base model
 VAE_MODEL="${VAE_MODEL:-}"                # Path to VAE model (for Anima)
 T5XXL_TOKENIZER="${T5XXL_TOKENIZER:-}"    # Path to T5-XXL tokenizer (for Anima, optional)
 QWEN3_MODEL="${QWEN3_MODEL:-}"            # Path to Qwen3 model (for Anima)
-CLIP_L_MODEL="${CLIP_L_MODEL:-}"          # Path to CLIP-L model (for SDXL)
-CLIP_G_MODEL="${CLIP_G_MODEL:-}"          # Path to CLIP-G model (for SDXL)
+CLIP_L_MODEL="${CLIP_L_MODEL:-}"          # Path to CLIP-L model (for SD3)
+CLIP_G_MODEL="${CLIP_G_MODEL:-}"          # Path to CLIP-G model (for SD3)
 
 # Project configuration
 PROJECT_NAME="${PROJECT_NAME:-}"          # Name for your project (e.g: my-lora)
-MODEL_VERSION="${MODEL_VERSION:-sdxl}"          # Model type: "sdxl" or "anima"
+MODEL_VERSION="${MODEL_VERSION:-sdxl}"          # Model type: "sdxl" or "anima" or "sd3"
 
 # Training parameters
 NETWORK_DIM="${NETWORK_DIM:-32}"
@@ -76,12 +76,22 @@ init_env() {
         sdxl) 
             TRAINING_SCRIPT="sdxl_train_network.py"
             NETWORK_MODULE="networks.lora"
+            EXTRA_TRAINING_CONFIG="unet_lr = 1e-4
+text_encoder_lr1 = 1e-5
+text_encoder_lr2 = 1e-5
+cache_latents = true"
+            ;;
+        sd3) 
+            TRAINING_SCRIPT="sd3_train_network.py"
+            NETWORK_MODULE="networks.lora"
             EXTRA_TRAINING_CONFIG="cache_latents = true"
             ;;
         anima)
             TRAINING_SCRIPT="anima_train_network.py"
             NETWORK_MODULE="networks.lora_anima"
-            EXTRA_TRAINING_CONFIG="cache_latents = true"
+            EXTRA_TRAINING_CONFIG="unet_lr = 1e-4
+text_encoder_lr = 1e-5
+cache_latents = true"
             ;;
         *)
             log_error "MODEL_VERSION must be 'sdxl' or 'anima'."
@@ -167,7 +177,7 @@ validate_inputs() {
     fi
 
     case "$MODEL_VERSION" in
-        sdxl)
+        sd3)
             if [ -z "$CLIP_L_MODEL" ]; then
                 log_error "CLIP_L_MODEL is not set for SDXL. Please set it in the configuration section."
                 exit 1
@@ -286,6 +296,9 @@ create_training_config() {
     MODEL_ARGS=""
     case "$MODEL_VERSION" in
         sdxl)
+            MODEL_ARGS="pretrained_model_name_or_path = \"${DIT_MODEL}\""
+            ;;
+        sd3)
             MODEL_ARGS="pretrained_model_name_or_path = \"${DIT_MODEL}\"
 clip_l = \"${CLIP_L_MODEL}\"
 clip_g = \"${CLIP_G_MODEL}\""
