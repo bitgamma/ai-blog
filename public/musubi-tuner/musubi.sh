@@ -16,13 +16,15 @@ MUSUBI_TUNER_INSTALL_DIR="${MUSUBI_TUNER_INSTALL_DIR:-$HOME}"
 DIT_MODEL="${DIT_MODEL:-}"  # Path to diffusion model (e.g., flux-2-klein-base-4b.safetensors)
 VAE_MODEL="${VAE_MODEL:-}"  # Path to VAE model (e.g., ae.safetensors)
 TEXT_ENCODER="${TEXT_ENCODER:-}"  # Path to text encoder model (e.g., model-00001-of-00002.safetensors)
+TURBO_DIT="${TURBO_DIT:-}"  # Path to Turbo DiT model (optional, Krea 2 only — for sample generation during training)
 
 # Project configuration
 PROJECT_NAME="${PROJECT_NAME:-}"  # Name for your project (e.g: my-lora)
-MODEL_VERSION="${MODEL_VERSION:-}"  # Model version: "klein-base-4b", "klein-base-9b", "z-image"
+MODEL_VERSION="${MODEL_VERSION:-}"  # Model version: "klein-base-4b", "klein-base-9b", "z-image", "krea2"
 
 # Training parameters
 NETWORK_DIM="${NETWORK_DIM:-32}"
+NETWORK_ALPHA="${NETWORK_ALPHA:-32}"
 LEARNING_RATE="${LEARNING_RATE:-1e-4}"
 MAX_EPOCHS="${MAX_EPOCHS:-30}"
 SAVE_EVERY_N="${SAVE_EVERY_N:-2}"
@@ -90,8 +92,20 @@ init_env() {
             TIMESTEP_SAMPLING="shift"
             EXTRA_TRAINING_CONFIG="discrete_flow_shift = 2.0"
             ;;
+        krea2)
+            TRAINING_SCRIPT="krea2_train_network.py"
+            CACHE_LATENT_SCRIPT="krea2_cache_latents.py"
+            CACHE_TEXT_ENCODER_SCRIPT="krea2_cache_text_encoder_outputs.py"
+            NETWORK_NAME="networks.lora_krea2"
+            TIMESTEP_SAMPLING="shift"
+            EXTRA_TRAINING_CONFIG="discrete_flow_shift = 2.5"
+            if [ -n "$TURBO_DIT" ]; then
+                EXTRA_TRAINING_CONFIG="${EXTRA_TRAINING_CONFIG}
+turbo_dit = \"${TURBO_DIT}\""
+            fi
+            ;;
         *)
-            log_error "MODEL_VERSION must be 'klein-base-4b', 'klein-base-9b' or 'z-image'."
+            log_error "MODEL_VERSION must be 'klein-base-4b', 'klein-base-9b', 'z-image' or 'krea2'."
             exit 1
             ;;
     esac    
@@ -149,11 +163,11 @@ setup_musubi_tuner() {
     
     # Install musubi-tuner with AMD GPU support
     log_info "Installing musubi-tuner..."
-    uv pip install -e . --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
+    uv pip install -e . --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
     
     # Install torchvision with AMD GPU support
     log_info "Installing torchvision..."
-    uv pip install torchvision --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
+    uv pip install torchvision --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
     
     log_info "musubi-tuner environment setup complete."
 }
@@ -283,6 +297,7 @@ compile_mode = "default"
 [network]
 network_module = "${NETWORK_NAME}"
 network_dim = ${NETWORK_DIM}
+network_alpha = ${NETWORK_ALPHA}
 
 [optimizer]
 optimizer_type = "AdamW"
@@ -505,6 +520,13 @@ help() {
     echo "            Usage: $0 convert [checkpoint_path1] [checkpoint_path2] ..."
     echo "  ema       Merge LoRA checkpoints using EMA"
     echo "            Usage: $0 ema [checkpoint_path1] [checkpoint_path2] ... --output_file output.safetensors [options...]"
+    echo ""
+    echo "Model versions: klein-base-4b, klein-base-9b, z-image, krea2"
+    echo ""
+    echo "Krea 2 notes:"
+    echo "  - Train on the RAW DiT model (set DIT_MODEL to raw.safetensors)"
+    echo "  - Optionally set TURBO_DIT to turbo.safetensors for sample generation during training"
+    echo "  - Use --l 1 --s 8 in reference prompts when using Turbo for sampling"
 }
 
 case "$1" in
