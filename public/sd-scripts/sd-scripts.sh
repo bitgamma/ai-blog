@@ -152,11 +152,11 @@ setup_sd_scripts() {
     
     # Install PyTorch with AMD GPU support
     log_info "Installing PyTorch with AMD GPU support..."
-    uv pip install torch torchvision torchaudio triton --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
+    uv pip install torch torchvision torchaudio triton --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
     
     # Install sd-scripts requirements
     log_info "Installing sd-scripts requirements..."
-    uv pip install --upgrade -r requirements.txt --extra-index-url "https://rocm.nightlies.amd.com/v2-staging/$GFX_NAME"
+    uv pip install --upgrade -r requirements.txt --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
     
     log_info "sd-scripts environment setup complete."
 }
