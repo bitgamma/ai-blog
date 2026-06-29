@@ -47,14 +47,15 @@ sudo -u comfyui bash
 cd
 git clone https://github.com/Comfy-Org/ComfyUI .
 uv venv --python 3.13
-uv pip install -r requirements.txt --extra-index-url https://rocm.nightlies.amd.com/v2/gfx1151
+uv pip install --upgrade --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ "torch[device-gfx1151]" "torchvision[device-gfx1151]" torchaudio
+uv pip install -r requirements.txt
 uv pip install -r manager_requirements.txt
 exit
 ```
 
 Note 1: Python 3.13 is recommended for the time being; `uv` will handle this automatically.
 
-Note 2: For Strix Point, the URL becomes `https://rocm.nightlies.amd.com/v2/gfx1150`.
+Note 2: For Strix Point, use `device-gfx1150` instead of `device-gfx1151`.
 
 ## Running with systemd
 
@@ -156,11 +157,12 @@ Periodically, you will want to update ComfyUI. This can be achieved with the fol
 sudo -u comfyui bash
 cd
 git pull
-uv pip install -r requirements.txt --extra-index-url https://rocm.nightlies.amd.com/v2/gfx1151
+uv pip install --upgrade --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ "torch[device-gfx1151]" "torchvision[device-gfx1151]" torchaudio
+uv pip install -r requirements.txt
 uv pip install -r manager_requirements.txt
 ```
 
-Once again, if you are on Strix Point, adjust the URL to `https://rocm.nightlies.amd.com/v2/gfx1150`.
+Once again, if you are on Strix Point, adjust the device to `device-gfx1150`.
 
 
 As the `uv` cache tends to grow, periodically you may also want to run:

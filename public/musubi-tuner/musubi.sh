@@ -161,13 +161,13 @@ setup_musubi_tuner() {
     # Activate virtual environment
     source .venv/bin/activate
     
-    # Install musubi-tuner with AMD GPU support
+    # Install PyTorch with AMD GPU support
+    log_info "Installing PyTorch with AMD GPU support..."
+    uv pip install --upgrade --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ "torch[device-$GFX_NAME]" "torchvision[device-$GFX_NAME]" torchaudio
+
+    # Install musubi-tuner
     log_info "Installing musubi-tuner..."
-    uv pip install -e . --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
-    
-    # Install torchvision with AMD GPU support
-    log_info "Installing torchvision..."
-    uv pip install torchvision --extra-index-url "https://rocm.nightlies.amd.com/v2/$GFX_NAME"
+    uv pip install -e .
     
     log_info "musubi-tuner environment setup complete."
 }
